@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ECMToolkit>
+    <Repositories default="MySQL_ECMToolkit1">
+        <Repository class="main.java.de.tw.ecm.toolkit.data.JDBCDataSource" id="MySQL_ECMToolkit1" caption="MySQL_ECMToolkit">
+        	<driver>com.mysql.jdbc.Driver</driver>
+        	<url>jdbc:mysql://localhost:3306/ECMToolkit</url>
+        </Repository>
+<!--         
+        <Repository class="main.java.de.tw.ecm.toolkit.data.CM8DataSource" id="CM8_icmnlsdb1" caption="CM8_icmnlsdb">
+        	<datastore>icmnlsdb</datastore>
+        </Repository>
+ -->        
+    </Repositories>
+</ECMToolkit>

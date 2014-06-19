@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.java.de.tw.ecm.toolkit.view.system.LoginController">
+   <children>
+      <AnchorPane prefHeight="200.0" prefWidth="200.0">
+         <children>
+            <TextField id="textField1" fx:id="txtUsername" layoutX="166.0" layoutY="118.0" />
+            <Label id="label1" layoutX="87.0" layoutY="122.0" text="%txtUsername" />
+            <Label id="label1" layoutX="87.0" layoutY="154.0" text="%pwdPassword" />
+            <PasswordField id="passwordField1" fx:id="pwdPassword" layoutX="166.0" layoutY="150.0" />
+            <Label layoutX="112.0" layoutY="40.0" text="ECM Toolkit">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Label>
+            <Button id="btnLogin" defaultButton="true" layoutX="165.0" layoutY="210.0" mnemonicParsing="false" onAction="#onLogin" text="%btnLogin" />
+            <Button id="btnCancel" cancelButton="true" layoutX="241.0" layoutY="210.0" mnemonicParsing="false" onAction="#onCancel" text="%btnCancel" />
+            <Label id="label1" layoutX="87.0" layoutY="184.0" text="%cmbRepository" />
+            <ComboBox id="cmbRepository" fx:id="cmbRepository" layoutX="166.0" layoutY="180.0" prefWidth="150.0" />
+         </children>
+      </AnchorPane>
+      <HBox layoutX="165.0" layoutY="242.0" prefHeight="44.0" prefWidth="161.0">
+         <children>
+            <Label fx:id="lblErrorMessage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" textFill="RED" />
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>
