@@ -1,27 +1,27 @@
-package main.java.de.tw.ecm.toolkit.prefs;
+package main.java.de.tw.ecm.toolkit.data.writer;
 
-public class RepositoryException extends Exception {
+public class WriterException extends Exception {
 
-	public RepositoryException() {
+	public WriterException() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public RepositoryException(String message) {
+	public WriterException(String message) {
 		super(message);
 		// TODO Auto-generated constructor stub
 	}
 
-	public RepositoryException(Throwable cause) {
+	public WriterException(Throwable cause) {
 		super(cause);
 		// TODO Auto-generated constructor stub
 	}
 
-	public RepositoryException(String message, Throwable cause) {
+	public WriterException(String message, Throwable cause) {
 		super(message, cause);
 		// TODO Auto-generated constructor stub
 	}
 
-	public RepositoryException(String message, Throwable cause,
+	public WriterException(String message, Throwable cause,
 			boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 		// TODO Auto-generated constructor stub
