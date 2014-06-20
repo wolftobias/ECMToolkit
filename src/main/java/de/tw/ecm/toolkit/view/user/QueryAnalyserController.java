@@ -5,13 +5,13 @@
  */
 package main.java.de.tw.ecm.toolkit.view.user;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -24,12 +24,14 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import main.java.de.tw.ecm.toolkit.data.DataSourceException;
 import main.java.de.tw.ecm.toolkit.data.Entity;
 import main.java.de.tw.ecm.toolkit.data.Entity.Attribute;
 import main.java.de.tw.ecm.toolkit.data.Entity.Attributes;
-import main.java.de.tw.ecm.toolkit.data.RepositoryException;
+import main.java.de.tw.ecm.toolkit.data.writer.CSVDataWriter;
+import main.java.de.tw.ecm.toolkit.data.writer.WriterException;
 
 /**
  * FXML Controller class
@@ -79,14 +81,14 @@ public class QueryAnalyserController extends AbstractUserController {
 						TreeItem<String> selectedItem = (TreeItem<String>) newValue;
 						if (selectedItem.isLeaf()) {
 							try {
-								selectedEntity = selectedRepository
+								selectedEntity = currentDataSource
 										.getEntities().getById(
 												selectedItem.getValue());
 								String query = selectedEntity
 										.getSelectQuery(null);
 								queryTextArea.setText(query);
 								toolBar.setDisable(false);
-							} catch (RepositoryException e) {
+							} catch (DataSourceException e) {
 								handleException(e);
 							}
 						} else
@@ -94,13 +96,13 @@ public class QueryAnalyserController extends AbstractUserController {
 					}
 
 				});
-		
+
 	}
 
 	public void onPlay(ActionEvent event) {
 		try {
 			String query = queryTextArea.getText();
-			ObservableList data = this.selectedEntity.selectAsList(query);
+			ObservableList data = this.selectedEntity.readAsList(query);
 			this.initDataTable(data);
 		} catch (DataSourceException e) {
 			this.handleException(e);
@@ -110,7 +112,7 @@ public class QueryAnalyserController extends AbstractUserController {
 	private void initDataTable(ObservableList data) {
 		TableColumn column;
 		Attributes attributes = this.selectedEntity.getAttributes();
-		
+
 		for (int i = 0; i < attributes.size(); i++) {
 			final Attribute attribute = attributes.get(i);
 			final int counter = i;
@@ -118,14 +120,14 @@ public class QueryAnalyserController extends AbstractUserController {
 			column.setCellValueFactory(new Callback<CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
 				public ObservableValue<String> call(
 						CellDataFeatures<ObservableList, String> param) {
-					return new SimpleStringProperty(param.getValue().get(
-							counter).toString());
+					return new SimpleStringProperty(param.getValue()
+							.get(counter).toString());
 				}
 			});
 
 			this.tableView.getColumns().add(column);
 		}
-		
+
 		this.tableView.setItems(data);
 	}
 
@@ -134,7 +136,32 @@ public class QueryAnalyserController extends AbstractUserController {
 	}
 
 	public void onExport(ActionEvent event) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle(this.resources
+				.getString("export.fileChooser.title"));
+		fileChooser.getExtensionFilters().add(
+				new FileChooser.ExtensionFilter("CSV File", "*.csv"));
+		fileChooser.setInitialFileName(this.selectedEntity.getCaption());
+		File file = fileChooser.showSaveDialog(this.context.getRootWindow());
+		
+		CSVDataWriter csvDataWriter = new CSVDataWriter();
+		if (file != null) {
+			try {
+				ObservableList items = this.tableView.getItems();
+				csvDataWriter.open(file);
 
+				for (int i = 0; i < items.size(); i++) {
+					ObservableList object = (ObservableList) items.get(i);
+					csvDataWriter.create(object.toArray());
+				}
+			} catch (WriterException e) {
+				this.handleException(e);
+			} finally {
+				try {
+					csvDataWriter.close();
+				} catch (WriterException e) {}
+			}
+		}
 	}
 
 	public void onQueryChoice(ActionEvent event) {

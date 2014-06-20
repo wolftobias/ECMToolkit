@@ -8,14 +8,11 @@ package main.java.de.tw.ecm.toolkit.view.user;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import main.java.de.tw.ecm.toolkit.data.DataSourceException;
 import main.java.de.tw.ecm.toolkit.data.Entities;
-import main.java.de.tw.ecm.toolkit.data.RepositoryException;
 
 /**
  * FXML Controller class
@@ -41,7 +38,7 @@ public class DataSourceExplorerController extends AbstractUserController {
 
 	private void setupTree() {
 		try {
-			Entities entities = this.selectedRepository.getEntities();
+			Entities entities = this.currentDataSource.getEntities();
 			TreeItem<String> rootItem = new TreeItem<String>(
 					this.selectedRepository.getCaption());
 			rootItem.setExpanded(true);
@@ -53,7 +50,7 @@ public class DataSourceExplorerController extends AbstractUserController {
 
 			this.treeView.setRoot(rootItem);
 			this.context.put(this.treeView);
-		} catch (RepositoryException e) {
+		} catch (DataSourceException e) {
 			this.handleException(e);
 		}
 	}

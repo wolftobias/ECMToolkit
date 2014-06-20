@@ -2,6 +2,8 @@ package main.java.de.tw.ecm.toolkit.data;
 
 import java.util.ArrayList;
 
+import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
+import main.java.de.tw.ecm.toolkit.prefs.Repository;
 import javafx.collections.ObservableList;
 
 public class Entity {
@@ -39,6 +41,7 @@ public class Entity {
 		this.repository = repository;
 		this.dataSource = dataSource;
 		this.id = id;
+		this.caption = id;
 	}
 
 	public String getCaption() {
@@ -73,12 +76,12 @@ public class Entity {
 		return this.dataSource.defaultSelectQuery(this.id, attributes);
 	}
 	
-	public ObservableList selectAsList(String query) throws DataSourceException {
-		return this.dataSource.selectAsList(query);
+	public ObservableList readAsList(String query) throws DataSourceException {
+		return this.dataSource.readAsList(query);
 	}
 	
-	public DataCursor select(String query) throws DataSourceException {
-		return this.dataSource.select(query);
+	public DataReader select(String query) throws DataSourceException {
+		return this.dataSource.read(query);
 	}
 	
 	public class Attributes {

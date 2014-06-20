@@ -13,8 +13,9 @@ import javafx.scene.Scene;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import main.java.de.tw.ecm.toolkit.data.Repository;
+import main.java.de.tw.ecm.toolkit.data.DataSource;
 import main.java.de.tw.ecm.toolkit.prefs.PreferencesFactory;
+import main.java.de.tw.ecm.toolkit.prefs.Repository;
 import main.java.de.tw.ecm.toolkit.prefs.SystemPreferences;
 import main.java.de.tw.ecm.toolkit.prefs.UserPreferences;
 import main.java.de.tw.ecm.toolkit.view.View;
@@ -46,6 +47,8 @@ public class Context {
 	private ViewContext viewContext;
 
 	private Repository selectedRepository;
+	
+	private DataSource currentDataSource;
 	
 	private Context() {
 		this.systemPrefs = PreferencesFactory.systemPrefs();
@@ -90,11 +93,16 @@ public class Context {
 	public ViewContext getViewContext() {
 		return viewContext;
 	}
-
+	
 	public ECMToolkit getECMToolkit() {
 		return (ECMToolkit) this.get(ECMToolkit.class);
 	}
-
+	
+	public Stage getRootWindow() {
+		ECMToolkit ecmToolkit = (ECMToolkit) this.get(ECMToolkit.class);
+		return ecmToolkit.getPrimaryStage();
+	}
+	
 	public CommandLine getCommandLine() {
 		return (CommandLine) this.get(CommandLine.class);
 	}
@@ -105,6 +113,14 @@ public class Context {
 
 	public void setSelectedRepository(Repository selectedRepository) {
 		this.selectedRepository = selectedRepository;
+	}
+
+	public DataSource getCurrentDataSource() {
+		return currentDataSource;
+	}
+
+	public void setCurrentDataSource(DataSource currentDataSource) {
+		this.currentDataSource = currentDataSource;
 	}
 
 	public class ViewContext {
@@ -136,7 +152,7 @@ public class Context {
 						MainController.class, "main");
 				put(main);
 
-				Views views = userPreferences.getViews();
+				Views views = systemPrefs.getViews();
 
 				for (int i = 0; i < views.size(); i++) {
 					View view = views.get(i);

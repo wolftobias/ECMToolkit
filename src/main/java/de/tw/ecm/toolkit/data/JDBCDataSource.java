@@ -12,10 +12,14 @@ import java.util.Properties;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import main.java.de.tw.ecm.toolkit.data.Entity.Attribute;
+import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
+import main.java.de.tw.ecm.toolkit.data.reader.JDBCDataReader;
+import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
+import main.java.de.tw.ecm.toolkit.prefs.Repository;
 
 import com.sun.istack.internal.logging.Logger;
 
-public class JDBCDataSource implements DataSource {
+public class JDBCDataSource extends AbstractDataSource {
 
 	Logger log = Logger.getLogger(JDBCDataSource.class);
 
@@ -65,44 +69,14 @@ public class JDBCDataSource implements DataSource {
 	}
 
 	@Override
-	public DataCursor select(String query) throws DataSourceException {
-		ResultSet rs = null;
-		DataCursor cursor;
+	public DataReader read(String query) throws DataSourceException {
 		try {
-			PreparedStatement prepareStatement = this.connection
-					.prepareStatement(query);
-			rs = prepareStatement.executeQuery();
-			cursor = new JDBCDataCursor(rs);
-		} catch (SQLException e) {
+			DataReader reader = new JDBCDataReader(this.connection);
+			reader.open(query);
+			return reader;
+		} catch (ReaderException e) {
 			throw new DataSourceException(e);
 		}
-
-		return cursor;
-	}
-
-	@Override
-	public ObservableList selectAsList(String query) throws DataSourceException {
-		ResultSet rs = null;
-		ObservableList data = FXCollections.observableArrayList();
-
-		try {
-			PreparedStatement prepareStatement = this.connection
-					.prepareStatement(query);
-			rs = prepareStatement.executeQuery();
-			while (rs.next()) {
-				ObservableList row = FXCollections.observableArrayList();
-				for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-					row.add(rs.getObject(i));
-				}
-				data.add(row);
-			}
-		} catch (SQLException e) {
-			throw new DataSourceException(e);
-		} finally {
-			closeQuietly(rs);
-		}
-
-		return data;
 	}
 
 	@Override
@@ -119,7 +93,7 @@ public class JDBCDataSource implements DataSource {
 		}
 	}
 
-	private void closeQuietly(ResultSet rs) throws DataSourceException {
+	private void closeQuietly(ResultSet rs) {
 		try {
 			if (rs != null)
 				rs.close();
@@ -179,5 +153,23 @@ public class JDBCDataSource implements DataSource {
 		} finally {
 			rs.close();
 		}
+	}
+
+	@Override
+	public void create() throws DataSourceException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update(Object[] items) throws DataSourceException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void delete(Object[] items) throws DataSourceException {
+		// TODO Auto-generated method stub
+		
 	}
 }

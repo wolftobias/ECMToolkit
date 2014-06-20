@@ -25,7 +25,9 @@ import org.apache.commons.cli.ParseException;
 public class ECMToolkit extends Application {
 
 	private Context context;
-  
+	
+	private Stage primaryStage;
+	
 	@Override
 	public void init() throws Exception {
 		super.init();
@@ -33,6 +35,7 @@ public class ECMToolkit extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) {
+		this.primaryStage = primaryStage;
 		try {
 			this.context = Context.context();
 			this.context.put(this);
@@ -62,9 +65,13 @@ public class ECMToolkit extends Application {
 	
 	@Override
 	public void stop() throws Exception {
-		this.context.getSelectedRepository().destroy();
+		this.context.getSelectedRepository().getDataSource().destroy();
 	}
 	
+	public Stage getPrimaryStage() {
+		return primaryStage;
+	}
+
 	/**
 	 * @param args
 	 *            the command line arguments

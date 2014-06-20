@@ -6,10 +6,26 @@
         	<driver>com.mysql.jdbc.Driver</driver>
         	<url>jdbc:mysql://localhost:3306/ECMToolkit</url>
         </Repository>
-<!--         
+         
         <Repository class="main.java.de.tw.ecm.toolkit.data.CM8DataSource" id="CM8_icmnlsdb1" caption="CM8_icmnlsdb">
         	<datastore>icmnlsdb</datastore>
         </Repository>
- -->        
     </Repositories>
+    
+     <Views default="QueryAnalyser">
+        <View id="QueryAnalyser" user="*" group="*" default="DataSourceTree">
+			<NavigationView
+				id="DataSourceTree"
+				default="QueryAnalyser"
+        		controller="main.java.de.tw.ecm.toolkit.view.user.DataSourceExplorerController" 
+        	  	resources="datasourceexplorer.properties"
+        	  	fxml="datasourceexplorer.fxml">
+				<ContentView id="QueryAnalyser"
+	        		controller="main.java.de.tw.ecm.toolkit.view.user.QueryAnalyserController" 
+	        	    resources="queryanalyser.properties"
+	        	    fxml="queryanalyser.fxml"/>
+			</NavigationView>        	  
+		</View>        	  
+    </Views>
+    
 </ECMToolkit>

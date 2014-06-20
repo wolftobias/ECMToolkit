@@ -12,9 +12,9 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import main.java.de.tw.ecm.toolkit.ECMToolkit;
-import main.java.de.tw.ecm.toolkit.data.Repositories;
-import main.java.de.tw.ecm.toolkit.data.RepositoryException;
+import main.java.de.tw.ecm.toolkit.data.DataSourceException;
+import main.java.de.tw.ecm.toolkit.prefs.Repositories;
+import main.java.de.tw.ecm.toolkit.prefs.RepositoryException;
 import main.java.de.tw.ecm.toolkit.view.AbstractController;
 
 import org.controlsfx.dialog.Dialogs;
@@ -32,12 +32,13 @@ public class LoginController extends AbstractController {
 	Label lblErrorMessage;
 	@FXML
 	ComboBox cmbRepository;
-	
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		super.initialize(location, resources);
 		try {
-			final Repositories repositories = this.context.getSystemPrefs().getRepositories();
+			final Repositories repositories = this.context.getSystemPrefs()
+					.getRepositories();
 			ObservableList<String> options = FXCollections
 					.observableArrayList(repositories.getRepositoryNames());
 			this.cmbRepository.setItems(options);
@@ -46,37 +47,44 @@ public class LoginController extends AbstractController {
 				public void handle(ActionEvent e) {
 					String selected = cmbRepository.getValue().toString();
 					repositories.setSelectedRepository(selected);
+					selectedRepository = repositories.getSelectedRepository();
+					try {
+						selectedRepository.initialize();
+					} catch (RepositoryException e1) {
+						handleException(e1);
+					}
+					currentDataSource = selectedRepository.getDataSource();
+					context.setSelectedRepository(selectedRepository);
+					context.setCurrentDataSource(currentDataSource);
 				}
 			});
 
 			// show the default repo as default in the combobox
 			this.cmbRepository.setValue(repositories.getDefaultRepository()
 					.getCaption());
-			this.selectedRepository = repositories.getSelectedRepository();
-			this.selectedRepository.initialize();
-			
-			if(this.context.getCommandLine().hasOption("user"))
-				this.setUsername(this.context.getCommandLine().getOptionValue("user"));
-			if(this.context.getCommandLine().hasOption("password"))
-				this.setPassword(this.context.getCommandLine().getOptionValue("password"));
-			
+
+			if (this.context.getCommandLine().hasOption("user"))
+				this.setUsername(this.context.getCommandLine().getOptionValue(
+						"user"));
+			if (this.context.getCommandLine().hasOption("password"))
+				this.setPassword(this.context.getCommandLine().getOptionValue(
+						"password"));
+
 		} catch (Exception e) {
 			Dialogs.create().showException(e);
 		}
 	}
-	
+
 	public void onLogin(ActionEvent event) {
 		try {
-			boolean login = this.selectedRepository.login(this.txtUsername.getText(),
-					this.pwdPassword.getText());
+			boolean login = this.currentDataSource.login(
+					this.txtUsername.getText(), this.pwdPassword.getText());
 
 			if (login) {
-				this.context.setSelectedRepository(selectedRepository);
 				this.context.getViewContext().showMainView();
-			}
-			else
+			} else
 				this.lblErrorMessage.setText("Login fehlgeschlagen!");
-		} catch (RepositoryException e) {
+		} catch (DataSourceException e) {
 			Dialogs.create().showException(e);
 		}
 	}

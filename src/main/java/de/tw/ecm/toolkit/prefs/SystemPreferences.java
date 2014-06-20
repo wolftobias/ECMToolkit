@@ -12,9 +12,11 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import main.java.de.tw.ecm.toolkit.data.Repositories;
-import main.java.de.tw.ecm.toolkit.data.Repository;
-import main.java.de.tw.ecm.toolkit.data.RepositoryException;
+import main.java.de.tw.ecm.toolkit.data.DataSource;
+import main.java.de.tw.ecm.toolkit.view.View;
+import main.java.de.tw.ecm.toolkit.view.View.NavigationView;
+import main.java.de.tw.ecm.toolkit.view.View.NavigationView.ContentView;
+import main.java.de.tw.ecm.toolkit.view.Views;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,6 +36,8 @@ public class SystemPreferences {
 
 	private Repositories repositories = new Repositories();
 
+	private Views views = new Views();
+
 	protected SystemPreferences() {
 		try {
 			InputStream is = SystemPreferences.class
@@ -43,6 +47,7 @@ public class SystemPreferences {
 			document = documentBuilder.parse(is);
 			
 			this.parseRepositories();
+			this.parseViews();
 		} catch (Exception e) {
 			log.log(Level.SEVERE, e.getMessage(), e);
 		}
@@ -50,6 +55,10 @@ public class SystemPreferences {
 
 	public Repositories getRepositories() throws RepositoryException {
 		return repositories;
+	}
+
+	public Views getViews() throws RepositoryException {
+		return views;
 	}
 
 	private void parseRepositories() throws RepositoryException {
@@ -72,8 +81,8 @@ public class SystemPreferences {
 				temp.setCaption(repoElement.getAttribute("caption"));
 				temp.setId(repoElement.getAttribute("id"));
 				try {
-					temp.setImplementationClass(Class.forName(repoElement
-							.getAttribute("class")));
+					Class dataSource = Class.forName(repoElement.getAttribute("class"));
+					temp.setImplementationClass(dataSource);
 				} catch (ClassNotFoundException e) {
 					throw new RepositoryException(e);
 				}
@@ -91,4 +100,87 @@ public class SystemPreferences {
 			}
 		}
 	}
+	
+	private void parseViews() throws RepositoryException {
+		View view;
+
+		Node viewsNode = document.getElementsByTagName("Views").item(0);
+		NodeList viewsNodes = viewsNode.getChildNodes();
+
+		String defaultView = viewsNode.getAttributes().getNamedItem("default")
+				.getTextContent();
+		this.views.setDefaultView(defaultView);
+
+		for (int i = 0; i < viewsNodes.getLength(); i++) {
+
+			Node viewNode = viewsNodes.item(i);
+			if (viewNode.getNodeType() == Node.ELEMENT_NODE) {
+
+				Element viewElement = (Element) viewNode;
+				view = new View();
+				view.setId(viewElement.getAttribute("id"));
+				view.setUser(viewElement.getAttribute("user"));
+				view.setGroup(viewElement.getAttribute("group"));
+				view.setDefaultNavigationView(viewElement.getAttribute("default"));
+
+				NodeList navViewNodes = viewNode.getChildNodes();
+				this.parseNavigationViews(view, navViewNodes);
+				this.views.add(view);
+			}
+		}
+	}
+
+	private void parseNavigationViews(View view, NodeList viewNodes)
+			throws RepositoryException {
+		NavigationView navigationView;
+
+		for (int i = 0; i < viewNodes.getLength(); i++) {
+
+			Node viewNode = viewNodes.item(i);
+			if (viewNode.getNodeType() == Node.ELEMENT_NODE) {
+
+				Element viewElement = (Element) viewNode;
+				navigationView = view.new NavigationView();
+				navigationView.setId(viewElement.getAttribute("id"));
+				navigationView.setDefaultContentView(viewElement.getAttribute("default"));
+				try {
+					navigationView.setController(Class.forName(viewElement.getAttribute("controller")));
+				} catch (ClassNotFoundException e) {
+					throw new RepositoryException(e);
+				}
+				navigationView.setResources(viewElement.getAttribute("resources"));
+				navigationView.setFxml(viewElement.getAttribute("fxml"));
+				
+				NodeList navViewNodes = viewNode.getChildNodes();
+				this.parseContentViews(navigationView, navViewNodes);
+				view.add(navigationView);
+			}
+		}
+	}
+
+	private void parseContentViews(NavigationView view, NodeList viewNodes)
+			throws RepositoryException {
+		ContentView contentView;
+
+		for (int i = 0; i < viewNodes.getLength(); i++) {
+
+			Node viewNode = viewNodes.item(i);
+			if (viewNode.getNodeType() == Node.ELEMENT_NODE) {
+
+				Element viewElement = (Element) viewNode;
+				contentView = view.new ContentView();
+				contentView.setId(viewElement.getAttribute("id"));
+				try {
+					contentView.setController(Class.forName(viewElement.getAttribute("controller")));
+				} catch (ClassNotFoundException e) {
+					throw new RepositoryException(e);
+				}
+				contentView.setResources(viewElement.getAttribute("resources"));
+				contentView.setFxml(viewElement.getAttribute("fxml"));
+
+				NodeList navViewNodes = viewNode.getChildNodes();
+				view.add(contentView);
+			}
+		}
+	}	
 }

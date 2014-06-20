@@ -7,7 +7,8 @@ import java.util.logging.Logger;
 
 import javafx.fxml.Initializable;
 import main.java.de.tw.ecm.toolkit.Context;
-import main.java.de.tw.ecm.toolkit.data.Repository;
+import main.java.de.tw.ecm.toolkit.data.DataSource;
+import main.java.de.tw.ecm.toolkit.prefs.Repository;
 
 import org.controlsfx.dialog.Dialogs;
 
@@ -20,6 +21,8 @@ public abstract class AbstractController implements Initializable {
 
 	protected Repository selectedRepository;
 
+	protected DataSource currentDataSource;
+	
 	protected Context context;
 
 	protected URL location;
@@ -37,6 +40,7 @@ public abstract class AbstractController implements Initializable {
 		try {
 			this.selectedRepository = this.context.getSystemPrefs()
 					.getRepositories().getSelectedRepository();
+			this.currentDataSource = this.context.getCurrentDataSource();
 		} catch (Exception e) {
 			this.handleException(e);
 		}
