@@ -1,4 +1,4 @@
-package main.java.de.tw.ecm.toolkit.prefs;
+package main.java.de.tw.ecm.toolkit.data;
 
 public class RepositoryException extends Exception {
 

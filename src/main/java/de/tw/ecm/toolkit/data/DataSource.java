@@ -4,7 +4,6 @@ import java.util.Properties;
 
 import javafx.collections.ObservableList;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
-import main.java.de.tw.ecm.toolkit.prefs.Repository;
 
 public interface DataSource {
 

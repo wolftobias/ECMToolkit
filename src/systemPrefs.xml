@@ -28,4 +28,11 @@
 		</View>        	  
     </Views>
     
+    <Entities>
+    	<Entity strategy="local">
+    		<Name>ID</Name>
+    		<Caption locale="de">Id</Caption>
+    	</Entity>
+    </Entities>
+    
 </ECMToolkit>

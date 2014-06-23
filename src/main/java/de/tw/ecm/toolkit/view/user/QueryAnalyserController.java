@@ -7,11 +7,13 @@ package main.java.de.tw.ecm.toolkit.view.user;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -106,7 +108,8 @@ public class QueryAnalyserController extends AbstractUserController {
 	public void onPlay(ActionEvent event) {
 		try {
 			String query = queryTextArea.getText();
-			ObservableList data = this.selectedEntity.readAsList(query);
+			List rows = this.selectedEntity.readAsList(query);
+			ObservableList data = FXCollections.observableList(rows);
 			this.initDataTable(data);
 		} catch (DataSourceException e) {
 			this.handleException(e);
@@ -137,13 +140,14 @@ public class QueryAnalyserController extends AbstractUserController {
 
 	public void onImport(ActionEvent event) {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle(this.resources.getString("import.fileChooser.title"));
+		fileChooser.setTitle(this.resources
+				.getString("import.fileChooser.title"));
 		fileChooser.getExtensionFilters().add(
 				new FileChooser.ExtensionFilter("CSV File", "*.csv"));
 		fileChooser.setInitialDirectory(selectedFile);
 		this.selectedFile = fileChooser.showOpenDialog(this.context
 				.getRootWindow());
-		
+
 		CSVDataReader csvDataReader = new CSVDataReader();
 		try {
 			csvDataReader.open(this.selectedFile);
@@ -173,10 +177,11 @@ public class QueryAnalyserController extends AbstractUserController {
 				ObservableList items = this.tableView.getItems();
 				csvDataWriter.open(this.selectedFile);
 				this.selectedFile = this.selectedFile.getParentFile();
-				
-				String[] captions = this.selectedEntity.getAttributes().getCaptions();
+
+				String[] captions = this.selectedEntity.getAttributes()
+						.getCaptions();
 				csvDataWriter.writeHeader(captions);
-				
+
 				for (int i = 0; i < items.size(); i++) {
 					ObservableList object = (ObservableList) items.get(i);
 					csvDataWriter.writeRow(object.toArray());

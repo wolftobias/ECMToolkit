@@ -13,8 +13,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import main.java.de.tw.ecm.toolkit.data.DataSourceException;
-import main.java.de.tw.ecm.toolkit.prefs.Repositories;
-import main.java.de.tw.ecm.toolkit.prefs.RepositoryException;
+import main.java.de.tw.ecm.toolkit.data.Repositories;
+import main.java.de.tw.ecm.toolkit.data.RepositoryException;
 import main.java.de.tw.ecm.toolkit.view.AbstractController;
 
 import org.controlsfx.dialog.Dialogs;

@@ -1,23 +1,22 @@
 package main.java.de.tw.ecm.toolkit.data;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
-import main.java.de.tw.ecm.toolkit.prefs.Repository;
-import javafx.collections.ObservableList;
 
 public class Entity {
-	
+
 	private Repository repository;
-	
+
 	private DataSource dataSource;
-	
+
 	private String caption;
 
 	private String id;
-	
+
 	private Attributes attributes = new Attributes();
-	
+
 	public Entity() {
 	}
 
@@ -37,7 +36,7 @@ public class Entity {
 		this.dataSource = dataSource;
 	}
 
-	public Entity(Repository repository, DataSource dataSource,  String id) {
+	public Entity(Repository repository, DataSource dataSource, String id) {
 		this.repository = repository;
 		this.dataSource = dataSource;
 		this.id = id;
@@ -59,7 +58,7 @@ public class Entity {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+
 	public Attributes getAttributes() {
 		return attributes;
 	}
@@ -67,30 +66,30 @@ public class Entity {
 	public void setAttributes(Attributes attributes) {
 		this.attributes = attributes;
 	}
-	
+
 	public void addAttribute(Attribute attribute) {
 		this.attributes.add(attribute);
 	}
-		
-	public String getSelectQuery(String...attributes) {
+
+	public String getSelectQuery(String... attributes) {
 		return this.dataSource.defaultSelectQuery(this.id, attributes);
 	}
-	
-	public ObservableList readAsList(String query) throws DataSourceException {
+
+	public List readAsList(String query) throws DataSourceException {
 		return this.dataSource.readAsList(query);
 	}
-	
+
 	public DataReader select(String query) throws DataSourceException {
 		return this.dataSource.read(query);
 	}
-	
+
 	public class Attributes {
-		private ArrayList<Attribute> cache = new ArrayList<>();
+		private List<Attribute> cache = new ArrayList<>();
 
 		public Attributes() {
 		}
 
-		public Attributes(ArrayList<Attribute> attributes) {
+		public Attributes(List<Attribute> attributes) {
 			this.cache = attributes;
 		}
 
@@ -103,8 +102,8 @@ public class Entity {
 			return null;
 		}
 
-		public Attribute[] getAttributes() {
-			return (Attribute[]) this.cache.toArray(new Attribute[cache.size()]);
+		public List<Attribute> getAttributes() {
+			return this.cache;
 		}
 
 		public void add(Attribute attribute) {
@@ -118,7 +117,7 @@ public class Entity {
 		public Attribute get(int i) {
 			return this.cache.get(i);
 		}
-		
+
 		public String[] getCaptions() {
 			String[] captions = new String[this.size()];
 			for (int i = 0; i < captions.length; i++) {
@@ -128,26 +127,26 @@ public class Entity {
 			return captions;
 		}
 	}
-	
+
 	public class Attribute {
-		
+
 		private String name;
-		
+
 		private String caption;
-		
+
 		private String type;
-		
+
 		private int size;
-		
+
 		private String nativeType;
-		
+
 		public Attribute() {
 		}
-		
+
 		public Attribute(String name) {
 			this.name = name;
 		}
-		
+
 		public String getName() {
 			return name;
 		}
@@ -171,11 +170,11 @@ public class Entity {
 		public void setType(String type) {
 			this.type = type;
 		}
-		
+
 		public Class getTypeClass() throws ClassNotFoundException {
 			return Class.forName(this.getType());
 		}
-		
+
 		public int getSize() {
 			return size;
 		}
@@ -191,7 +190,6 @@ public class Entity {
 		public void setNativeType(String nativeType) {
 			this.nativeType = nativeType;
 		}
-		
-		
+
 	}
 }

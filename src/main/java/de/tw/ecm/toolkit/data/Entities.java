@@ -1,6 +1,7 @@
 package main.java.de.tw.ecm.toolkit.data;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Entities {
 
@@ -31,8 +32,8 @@ public class Entities {
 		return null;
 	}
 
-	public Entity[] getEntities() {
-		return (Entity[]) this.cache.toArray(new Entity[cache.size()]);
+	public List<Entity> getEntities() {
+		return this.cache;
 	}
 
 	public void add(Entity entity) {

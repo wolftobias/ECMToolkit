@@ -15,7 +15,6 @@ import main.java.de.tw.ecm.toolkit.data.Entity.Attribute;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.JDBCDataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
-import main.java.de.tw.ecm.toolkit.prefs.Repository;
 
 import com.sun.istack.internal.logging.Logger;
 

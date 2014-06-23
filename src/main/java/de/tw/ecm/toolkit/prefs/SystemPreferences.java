@@ -13,6 +13,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import main.java.de.tw.ecm.toolkit.data.DataSource;
+import main.java.de.tw.ecm.toolkit.data.Repositories;
+import main.java.de.tw.ecm.toolkit.data.Repository;
+import main.java.de.tw.ecm.toolkit.data.RepositoryException;
 import main.java.de.tw.ecm.toolkit.view.View;
 import main.java.de.tw.ecm.toolkit.view.View.NavigationView;
 import main.java.de.tw.ecm.toolkit.view.View.NavigationView.ContentView;
