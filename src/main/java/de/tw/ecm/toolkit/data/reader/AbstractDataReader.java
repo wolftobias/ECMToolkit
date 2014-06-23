@@ -8,7 +8,7 @@ public abstract class AbstractDataReader implements DataReader {
 	@Override
 	public ObservableList<Object> readAsList() throws ReaderException {
 		ObservableList<Object> row = FXCollections.observableArrayList();
-		row.addAll(this.read());
+		row.addAll(this.readRow());
 		return row;
 	}
 }

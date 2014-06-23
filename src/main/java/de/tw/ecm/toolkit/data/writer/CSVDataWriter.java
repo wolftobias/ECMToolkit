@@ -12,10 +12,10 @@ import org.supercsv.prefs.CsvPreference;
 public class CSVDataWriter extends AbstractDataWriter {
 
 	private CSVWriter csvWriter;
-	
+
 	public CSVDataWriter() {
 	}
-	
+
 	public CSVDataWriter(String file) throws WriterException {
 		this.open(file);
 	}
@@ -49,7 +49,7 @@ public class CSVDataWriter extends AbstractDataWriter {
 	}
 
 	@Override
-	public void create(Object[] items) throws WriterException {
+	public void writeRow(Object[] items) throws WriterException {
 		try {
 			this.csvWriter.write(items);
 		} catch (IOException e) {
@@ -57,16 +57,20 @@ public class CSVDataWriter extends AbstractDataWriter {
 		}
 	}
 
-	@Override
-	public void update() throws WriterException {
-		// TODO Auto-generated method stub
-
+	public void writeHeader(String[] headers) throws WriterException {
+		try {
+			this.csvWriter.writeHeader(headers);
+		} catch (IOException e) {
+			throw new WriterException(e);
+		}
 	}
 
-	@Override
-	public void delete() throws WriterException {
-		// TODO Auto-generated method stub
-
+	public void writeComment(String comment) throws WriterException {
+		try {
+			this.csvWriter.writeComment(comment);
+		} catch (IOException e) {
+			throw new WriterException(e);
+		}
 	}
 
 	private class CSVWriter extends AbstractCsvWriter {

@@ -118,6 +118,15 @@ public class Entity {
 		public Attribute get(int i) {
 			return this.cache.get(i);
 		}
+		
+		public String[] getCaptions() {
+			String[] captions = new String[this.size()];
+			for (int i = 0; i < captions.length; i++) {
+				captions[i] = this.get(i).getCaption();
+			}
+
+			return captions;
+		}
 	}
 	
 	public class Attribute {

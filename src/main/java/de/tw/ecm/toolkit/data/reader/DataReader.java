@@ -8,7 +8,7 @@ public interface DataReader {
 
 	public void close() throws ReaderException;
 
-	public Object[] read() throws ReaderException;
+	public Object[] readRow() throws ReaderException;
 
 	public ObservableList<Object> readAsList() throws ReaderException;
 

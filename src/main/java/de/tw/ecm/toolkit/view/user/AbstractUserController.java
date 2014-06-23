@@ -7,6 +7,6 @@ public abstract class AbstractUserController extends AbstractController {
 	protected String caption;
 
 	public String getCaption() {
-		return this.resources.getString("view.caption");
+		return this.resources.getString("view.title");
 	}
 }

@@ -6,9 +6,5 @@ public interface DataWriter {
 
 	public void close() throws WriterException;
 
-	public void create(Object[] items) throws WriterException;
-
-	public void update() throws WriterException;
-
-	public void delete() throws WriterException;
+	public void writeRow(Object[] items) throws WriterException;
 }

@@ -37,7 +37,7 @@ public class JDBCDataReader extends AbstractDataReader {
 	}
 
 	@Override
-	public Object[] read() throws ReaderException {
+	public Object[] readRow() throws ReaderException {
 		try {
 			int columnCount = rs.getMetaData().getColumnCount();
 			Object[] result = new Object[columnCount];

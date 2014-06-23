@@ -30,6 +30,8 @@ import main.java.de.tw.ecm.toolkit.data.DataSourceException;
 import main.java.de.tw.ecm.toolkit.data.Entity;
 import main.java.de.tw.ecm.toolkit.data.Entity.Attribute;
 import main.java.de.tw.ecm.toolkit.data.Entity.Attributes;
+import main.java.de.tw.ecm.toolkit.data.reader.CSVDataReader;
+import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
 import main.java.de.tw.ecm.toolkit.data.writer.CSVDataWriter;
 import main.java.de.tw.ecm.toolkit.data.writer.WriterException;
 
@@ -62,6 +64,8 @@ public class QueryAnalyserController extends AbstractUserController {
 	private TableView tableView;
 
 	private Entity selectedEntity;
+
+	private File selectedFile = new File(System.getProperty("user.home"));
 
 	/**
 	 * Initializes the controller class.
@@ -132,7 +136,24 @@ public class QueryAnalyserController extends AbstractUserController {
 	}
 
 	public void onImport(ActionEvent event) {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle(this.resources.getString("import.fileChooser.title"));
+		fileChooser.getExtensionFilters().add(
+				new FileChooser.ExtensionFilter("CSV File", "*.csv"));
+		fileChooser.setInitialDirectory(selectedFile);
+		this.selectedFile = fileChooser.showOpenDialog(this.context
+				.getRootWindow());
+		
+		CSVDataReader csvDataReader = new CSVDataReader();
+		try {
+			csvDataReader.open(this.selectedFile);
+			this.selectedFile = this.selectedFile.getParentFile();
 
+			String[] headers = csvDataReader.getHeaders();
+			ObservableList<Object> readAsList = csvDataReader.readAsList();
+		} catch (ReaderException e) {
+			this.handleException(e);
+		}
 	}
 
 	public void onExport(ActionEvent event) {
@@ -142,24 +163,31 @@ public class QueryAnalyserController extends AbstractUserController {
 		fileChooser.getExtensionFilters().add(
 				new FileChooser.ExtensionFilter("CSV File", "*.csv"));
 		fileChooser.setInitialFileName(this.selectedEntity.getCaption());
-		File file = fileChooser.showSaveDialog(this.context.getRootWindow());
-		
+		fileChooser.setInitialDirectory(selectedFile);
+		this.selectedFile = fileChooser.showSaveDialog(this.context
+				.getRootWindow());
+
 		CSVDataWriter csvDataWriter = new CSVDataWriter();
-		if (file != null) {
+		if (this.selectedFile != null) {
 			try {
 				ObservableList items = this.tableView.getItems();
-				csvDataWriter.open(file);
-
+				csvDataWriter.open(this.selectedFile);
+				this.selectedFile = this.selectedFile.getParentFile();
+				
+				String[] captions = this.selectedEntity.getAttributes().getCaptions();
+				csvDataWriter.writeHeader(captions);
+				
 				for (int i = 0; i < items.size(); i++) {
 					ObservableList object = (ObservableList) items.get(i);
-					csvDataWriter.create(object.toArray());
+					csvDataWriter.writeRow(object.toArray());
 				}
 			} catch (WriterException e) {
 				this.handleException(e);
 			} finally {
 				try {
 					csvDataWriter.close();
-				} catch (WriterException e) {}
+				} catch (WriterException e) {
+				}
 			}
 		}
 	}
