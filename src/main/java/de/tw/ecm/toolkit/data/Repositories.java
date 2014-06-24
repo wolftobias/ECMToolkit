@@ -2,6 +2,9 @@ package main.java.de.tw.ecm.toolkit.data;
 
 import java.util.ArrayList;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name = "Repositories")
 public class Repositories {
 
 	private ArrayList<Repository> cache = new ArrayList<>();
@@ -9,7 +12,7 @@ public class Repositories {
 	private String defaultRepo;
 
 	private Repository selected;
-	
+
 	public Repositories() {
 	}
 

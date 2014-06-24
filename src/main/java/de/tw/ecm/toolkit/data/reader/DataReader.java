@@ -1,6 +1,7 @@
 package main.java.de.tw.ecm.toolkit.data.reader;
 
-import javafx.collections.ObservableList;
+import main.java.de.tw.ecm.toolkit.data.DataList;
+import main.java.de.tw.ecm.toolkit.data.DataRow;
 
 public interface DataReader {
 
@@ -8,9 +9,7 @@ public interface DataReader {
 
 	public void close() throws ReaderException;
 
-	public Object[] readRow() throws ReaderException;
-
-	public ObservableList<Object> readAsList() throws ReaderException;
+	public DataRow readRow() throws ReaderException;
 
 	public boolean next() throws ReaderException;
 }

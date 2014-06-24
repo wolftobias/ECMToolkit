@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
+import main.java.de.tw.ecm.toolkit.data.sources.DataSource;
+import main.java.de.tw.ecm.toolkit.data.sources.DataSourceException;
 
 public class Entity {
 
@@ -75,8 +77,8 @@ public class Entity {
 		return this.dataSource.defaultSelectQuery(this.id, attributes);
 	}
 
-	public List readAsList(String query) throws DataSourceException {
-		return this.dataSource.readAsList(query);
+	public DataList readList(String query) throws DataSourceException {
+		return this.dataSource.readList(query);
 	}
 
 	public DataReader select(String query) throws DataSourceException {

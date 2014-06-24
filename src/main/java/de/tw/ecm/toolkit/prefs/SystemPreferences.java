@@ -12,7 +12,6 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import main.java.de.tw.ecm.toolkit.data.DataSource;
 import main.java.de.tw.ecm.toolkit.data.Repositories;
 import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.data.RepositoryException;
@@ -48,7 +47,7 @@ public class SystemPreferences {
 			DocumentBuilder documentBuilder = DocumentBuilderFactory
 					.newInstance().newDocumentBuilder();
 			document = documentBuilder.parse(is);
-			
+
 			this.parseRepositories();
 			this.parseViews();
 		} catch (Exception e) {
@@ -84,7 +83,8 @@ public class SystemPreferences {
 				temp.setCaption(repoElement.getAttribute("caption"));
 				temp.setId(repoElement.getAttribute("id"));
 				try {
-					Class dataSource = Class.forName(repoElement.getAttribute("class"));
+					Class dataSource = Class.forName(repoElement
+							.getAttribute("class"));
 					temp.setImplementationClass(dataSource);
 				} catch (ClassNotFoundException e) {
 					throw new RepositoryException(e);
@@ -103,7 +103,7 @@ public class SystemPreferences {
 			}
 		}
 	}
-	
+
 	private void parseViews() throws RepositoryException {
 		View view;
 
@@ -124,7 +124,8 @@ public class SystemPreferences {
 				view.setId(viewElement.getAttribute("id"));
 				view.setUser(viewElement.getAttribute("user"));
 				view.setGroup(viewElement.getAttribute("group"));
-				view.setDefaultNavigationView(viewElement.getAttribute("default"));
+				view.setDefaultNavigationView(viewElement
+						.getAttribute("default"));
 
 				NodeList navViewNodes = viewNode.getChildNodes();
 				this.parseNavigationViews(view, navViewNodes);
@@ -145,15 +146,18 @@ public class SystemPreferences {
 				Element viewElement = (Element) viewNode;
 				navigationView = view.new NavigationView();
 				navigationView.setId(viewElement.getAttribute("id"));
-				navigationView.setDefaultContentView(viewElement.getAttribute("default"));
+				navigationView.setDefaultContentView(viewElement
+						.getAttribute("default"));
 				try {
-					navigationView.setController(Class.forName(viewElement.getAttribute("controller")));
+					navigationView.setController(Class.forName(viewElement
+							.getAttribute("controller")));
 				} catch (ClassNotFoundException e) {
 					throw new RepositoryException(e);
 				}
-				navigationView.setResources(viewElement.getAttribute("resources"));
+				navigationView.setResources(viewElement
+						.getAttribute("resources"));
 				navigationView.setFxml(viewElement.getAttribute("fxml"));
-				
+
 				NodeList navViewNodes = viewNode.getChildNodes();
 				this.parseContentViews(navigationView, navViewNodes);
 				view.add(navigationView);
@@ -174,7 +178,8 @@ public class SystemPreferences {
 				contentView = view.new ContentView();
 				contentView.setId(viewElement.getAttribute("id"));
 				try {
-					contentView.setController(Class.forName(viewElement.getAttribute("controller")));
+					contentView.setController(Class.forName(viewElement
+							.getAttribute("controller")));
 				} catch (ClassNotFoundException e) {
 					throw new RepositoryException(e);
 				}
@@ -185,5 +190,5 @@ public class SystemPreferences {
 				view.add(contentView);
 			}
 		}
-	}	
+	}
 }

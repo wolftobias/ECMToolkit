@@ -1,7 +1,6 @@
-package main.java.de.tw.ecm.toolkit.data;
+package main.java.de.tw.ecm.toolkit.data.sources;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import main.java.de.tw.ecm.toolkit.data.DataList;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
 
@@ -12,13 +11,13 @@ public abstract class AbstractDataSource implements DataSource {
 	Logger log = Logger.getLogger(AbstractDataSource.class);
 
 	@Override
-	public ObservableList readAsList(String query) throws DataSourceException {
+	public DataList readList(String query) throws DataSourceException {
 		DataReader reader = this.read(query);
-		ObservableList data = FXCollections.observableArrayList();
+		DataList dataList = new DataList();
 
 		try {
 			while (reader.next()) {
-				data.add(reader.readAsList());
+				dataList.add(reader.readRow());
 			}
 		} catch (ReaderException e) {
 			throw new DataSourceException(e);
@@ -26,7 +25,7 @@ public abstract class AbstractDataSource implements DataSource {
 			closeQuietly(reader);
 		}
 
-		return data;
+		return dataList;
 	}
 
 	private void closeQuietly(DataReader reader) {

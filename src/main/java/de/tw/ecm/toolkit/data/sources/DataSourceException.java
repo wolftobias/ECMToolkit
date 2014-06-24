@@ -1,4 +1,4 @@
-package main.java.de.tw.ecm.toolkit.data;
+package main.java.de.tw.ecm.toolkit.data.sources;
 
 public class DataSourceException extends Exception {
 

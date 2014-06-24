@@ -1,8 +1,10 @@
-package main.java.de.tw.ecm.toolkit.data;
+package main.java.de.tw.ecm.toolkit.data.sources;
 
 import java.util.Properties;
 
 import javafx.collections.ObservableList;
+import main.java.de.tw.ecm.toolkit.data.Entities;
+import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 
 public class CM8DataSource extends AbstractDataSource {

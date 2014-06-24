@@ -2,6 +2,11 @@ package main.java.de.tw.ecm.toolkit.data;
 
 import java.util.Properties;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+import main.java.de.tw.ecm.toolkit.data.sources.DataSource;
+
+@XmlRootElement(name = "Repository")
 public class Repository {
 
 	private Class<DataSource> implementationClass;

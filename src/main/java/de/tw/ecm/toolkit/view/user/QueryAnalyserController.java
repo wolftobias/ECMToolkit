@@ -7,13 +7,11 @@ package main.java.de.tw.ecm.toolkit.view.user;
 
 import java.io.File;
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -28,12 +26,14 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
-import main.java.de.tw.ecm.toolkit.data.DataSourceException;
+import main.java.de.tw.ecm.toolkit.data.DataList;
+import main.java.de.tw.ecm.toolkit.data.DataRow;
 import main.java.de.tw.ecm.toolkit.data.Entity;
 import main.java.de.tw.ecm.toolkit.data.Entity.Attribute;
 import main.java.de.tw.ecm.toolkit.data.Entity.Attributes;
 import main.java.de.tw.ecm.toolkit.data.reader.CSVDataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
+import main.java.de.tw.ecm.toolkit.data.sources.DataSourceException;
 import main.java.de.tw.ecm.toolkit.data.writer.CSVDataWriter;
 import main.java.de.tw.ecm.toolkit.data.writer.WriterException;
 
@@ -108,9 +108,8 @@ public class QueryAnalyserController extends AbstractUserController {
 	public void onPlay(ActionEvent event) {
 		try {
 			String query = queryTextArea.getText();
-			List rows = this.selectedEntity.readAsList(query);
-			ObservableList data = FXCollections.observableList(rows);
-			this.initDataTable(data);
+			DataList dataList = this.selectedEntity.readList(query);
+			this.initDataTable(dataList.toObservableList());
 		} catch (DataSourceException e) {
 			this.handleException(e);
 		}
@@ -154,7 +153,7 @@ public class QueryAnalyserController extends AbstractUserController {
 			this.selectedFile = this.selectedFile.getParentFile();
 
 			String[] headers = csvDataReader.getHeaders();
-			ObservableList<Object> readAsList = csvDataReader.readAsList();
+			DataRow row = csvDataReader.readRow();
 		} catch (ReaderException e) {
 			this.handleException(e);
 		}

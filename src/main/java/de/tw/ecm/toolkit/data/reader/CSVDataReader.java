@@ -6,6 +6,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
+import main.java.de.tw.ecm.toolkit.data.DataList;
+import main.java.de.tw.ecm.toolkit.data.DataRow;
+
 import org.supercsv.io.AbstractCsvReader;
 import org.supercsv.prefs.CsvPreference;
 
@@ -48,16 +51,16 @@ public class CSVDataReader extends AbstractDataReader {
 	}
 
 	@Override
-	public Object[] readRow() throws ReaderException {
-		int length = this.csvReader.length() -1;
+	public DataRow readRow() throws ReaderException {
+		int length = this.csvReader.length() - 1;
 		Object[] result = new Object[length];
 
 		for (int i = 1; i <= length; i++) {
 			Object object = this.csvReader.get(i);
-			result[i-1] = object;
+			result[i - 1] = object;
 		}
 
-		return result;
+		return new DataRow(result);
 	}
 
 	@Override

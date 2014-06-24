@@ -1,8 +1,10 @@
-package main.java.de.tw.ecm.toolkit.data;
+package main.java.de.tw.ecm.toolkit.data.sources;
 
 import java.util.Properties;
 
-import javafx.collections.ObservableList;
+import main.java.de.tw.ecm.toolkit.data.DataList;
+import main.java.de.tw.ecm.toolkit.data.Entities;
+import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 
 public interface DataSource {
@@ -21,7 +23,7 @@ public interface DataSource {
 
 	public DataReader read(String query) throws DataSourceException;
 
-	public ObservableList readAsList(String query) throws DataSourceException;
+	public DataList readList(String query) throws DataSourceException;
 
 	public void update(Object[] items) throws DataSourceException;
 

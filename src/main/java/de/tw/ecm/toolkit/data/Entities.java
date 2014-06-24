@@ -5,12 +5,18 @@ import java.util.List;
 
 public class Entities {
 
-	private ArrayList<Entity> cache = new ArrayList<>();
+	private static final String LOCAL_STRATEGY = "LOCAL_STRATEGY";
+	private static final String REPOSITORY_STRATEGY = "REPOSITORY_STRATEGY";
+	private static final String MIXED_STRATEGY = "MIXED_STRATEGY";
+	
+	private String strategy;
+	
+	private List<Entity> cache = new ArrayList<>();
 
 	public Entities() {
 	}
 
-	public Entities(ArrayList<Entity> entities) {
+	public Entities(List<Entity> entities) {
 		this.cache = entities;
 	}
 

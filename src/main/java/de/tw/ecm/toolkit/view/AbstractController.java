@@ -7,8 +7,8 @@ import java.util.logging.Logger;
 
 import javafx.fxml.Initializable;
 import main.java.de.tw.ecm.toolkit.Context;
-import main.java.de.tw.ecm.toolkit.data.DataSource;
 import main.java.de.tw.ecm.toolkit.data.Repository;
+import main.java.de.tw.ecm.toolkit.data.sources.DataSource;
 
 import org.controlsfx.dialog.Dialogs;
 

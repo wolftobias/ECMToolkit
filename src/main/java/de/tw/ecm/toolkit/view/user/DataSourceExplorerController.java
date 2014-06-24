@@ -11,8 +11,8 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import main.java.de.tw.ecm.toolkit.data.DataSourceException;
 import main.java.de.tw.ecm.toolkit.data.Entities;
+import main.java.de.tw.ecm.toolkit.data.sources.DataSourceException;
 
 /**
  * FXML Controller class

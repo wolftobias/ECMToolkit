@@ -5,6 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import main.java.de.tw.ecm.toolkit.data.DataList;
+import main.java.de.tw.ecm.toolkit.data.DataRow;
+
 public class JDBCDataReader extends AbstractDataReader {
 
 	private Connection connection;
@@ -37,7 +40,7 @@ public class JDBCDataReader extends AbstractDataReader {
 	}
 
 	@Override
-	public Object[] readRow() throws ReaderException {
+	public DataRow readRow() throws ReaderException {
 		try {
 			int columnCount = rs.getMetaData().getColumnCount();
 			Object[] result = new Object[columnCount];
@@ -47,7 +50,7 @@ public class JDBCDataReader extends AbstractDataReader {
 				result[i - 1] = object;
 			}
 
-			return result;
+			return new DataRow(result);
 		} catch (SQLException e) {
 			throw new ReaderException(e);
 		}
