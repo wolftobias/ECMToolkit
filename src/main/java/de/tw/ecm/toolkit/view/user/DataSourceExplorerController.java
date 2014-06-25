@@ -12,6 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import main.java.de.tw.ecm.toolkit.data.Entities;
+import main.java.de.tw.ecm.toolkit.data.RepositoryException;
 
 /**
  * FXML Controller class
@@ -36,17 +37,21 @@ public class DataSourceExplorerController extends AbstractUserController {
 	}
 
 	private void setupTree() {
-		Entities entities = new Entities().build();
-		TreeItem<String> rootItem = new TreeItem<String>(
-				this.selectedRepository.getCaption());
-		rootItem.setExpanded(true);
-		for (int i = 0; i < entities.size(); i++) {
-			TreeItem<String> item = new TreeItem<String>(entities.get(i)
-					.getId());
-			rootItem.getChildren().add(item);
-		}
+		try {
+			Entities entities = this.selectedRepository.getEntities();
+			TreeItem<String> rootItem = new TreeItem<String>(
+					this.selectedRepository.getCaption());
+			rootItem.setExpanded(true);
+			for (int i = 0; i < entities.size(); i++) {
+				TreeItem<String> item = new TreeItem<String>(entities.get(i)
+						.getId());
+				rootItem.getChildren().add(item);
+			}
 
-		this.treeView.setRoot(rootItem);
-		this.context.put(this.treeView);
+			this.treeView.setRoot(rootItem);
+			this.context.put(this.treeView);
+		} catch (RepositoryException e) {
+			this.handleException(e);
+		}
 	}
 }

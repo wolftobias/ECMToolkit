@@ -79,7 +79,7 @@ public class CSVDataReader extends AbstractDataReader {
 
 	private class CSVReader extends AbstractCsvReader {
 		CSVReader(final Reader reader) {
-			super(reader, CsvPreference.STANDARD_PREFERENCE);
+			super(reader, CsvPreference.TAB_PREFERENCE);
 		}
 	}
 }

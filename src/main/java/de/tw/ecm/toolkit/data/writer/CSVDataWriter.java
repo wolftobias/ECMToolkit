@@ -75,7 +75,7 @@ public class CSVDataWriter extends AbstractDataWriter {
 
 	private class CSVWriter extends AbstractCsvWriter {
 		CSVWriter(final Writer writer) {
-			super(writer, CsvPreference.STANDARD_PREFERENCE);
+			super(writer, CsvPreference.TAB_PREFERENCE);
 		}
 
 		public void write(Object... columns) throws IOException {

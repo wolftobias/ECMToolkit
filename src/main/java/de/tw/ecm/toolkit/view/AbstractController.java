@@ -39,7 +39,7 @@ public abstract class AbstractController implements Initializable {
 		this.context.put(this);
 		
 		try {
-			this.selectedRepository = new Repositories().build().getSelectedRepository();
+			this.selectedRepository = this.context.getSelectedRepository();
 		} catch (Exception e) {
 			this.handleException(e);
 		}

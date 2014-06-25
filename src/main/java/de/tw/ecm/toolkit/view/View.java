@@ -1,14 +1,18 @@
 package main.java.de.tw.ecm.toolkit.view;
 
 import java.util.ArrayList;
-import java.util.ResourceBundle;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
-@XmlType(propOrder = { "id", "user", "group", "default" })
-public class View {
+import org.apache.commons.lang3.builder.Builder;
+
+@XmlType(propOrder = { "id", "user", "group", "default", "views" })
+public class View implements Builder<View>, Iterable<NavigationView> {
 
 	private String id;
 
@@ -34,20 +38,26 @@ public class View {
 	public NavigationView get(int i) {
 		return this.cache.get(i);
 	}
-	
+
 	public NavigationView getDefaultNavigationView() {
 		return this.getById(this.defaultView);
 	}
 
 	public NavigationView getById(String id) {
-		for (int i = 0; i < cache.size(); i++) {
-			if (cache.get(i).getId().equals(id))
-				return cache.get(i);
+		for (NavigationView view : this.cache) {
+			if (view.getId().equals(id))
+				return view;
 		}
 
 		return null;
 	}
-	
+
+	@XmlElementWrapper(name = "navigationviews")
+	@XmlElement(name = "navigationview")
+	public List<NavigationView> getViews() {
+		return this.cache;
+	}
+
 	@XmlAttribute
 	public String getId() {
 		return id;
@@ -65,7 +75,7 @@ public class View {
 	public void setUser(String user) {
 		this.user = user;
 	}
-	
+
 	@XmlAttribute
 	public String getGroup() {
 		return group;
@@ -74,7 +84,7 @@ public class View {
 	public void setGroup(String group) {
 		this.group = group;
 	}
-	
+
 	@XmlAttribute
 	public String getDefault() {
 		return defaultView;
@@ -83,146 +93,18 @@ public class View {
 	public void setDefault(String defaultView) {
 		this.defaultView = defaultView;
 	}
-	
-	@XmlType(propOrder = { "id", "controller", "resources", "fxml", "default" })
-	public static class NavigationView {
 
-		private String id;
+	@Override
+	public Iterator<NavigationView> iterator() {
+		return this.cache.iterator();
+	}
 
-		private Class controller;
-
-		private String resources;
-
-		private String fxml;
-
-		private String defaultView;
-
-		private ArrayList<ContentView> cache = new ArrayList<>();
-
-		public NavigationView() {
+	@Override
+	public View build() {
+		for (NavigationView navigationView : this.cache) {
+			navigationView.build();
 		}
 
-		public void add(ContentView View) {
-			this.cache.add(View);
-		}
-
-		public int size() {
-			return this.cache.size();
-		}
-
-		public ContentView get(int i) {
-			return this.cache.get(i);
-		}
-
-		public ContentView getById(String id) {
-			for (int i = 0; i < cache.size(); i++) {
-				if (cache.get(i).getId().equals(id))
-					return cache.get(i);
-			}
-
-			return null;
-		}
-		
-		public ContentView getDefaultContentView() {
-			return this.getById(this.defaultView);
-		}
-		
-		@XmlAttribute(name="default")		
-		public String getDefault() {
-			return this.defaultView;
-		}
-		
-		public void setDefault(String defaultView) {
-			this.defaultView = defaultView;
-		}
-
-		public Class getController() {
-			return controller;
-		}
-
-		public void setController(Class controller) {
-			this.controller = controller;
-		}
-
-		public String getResources() {
-			return resources;
-		}
-
-		public void setResources(String resources) {
-			this.resources = resources;
-		}
-
-		public String getFxml() {
-			return fxml;
-		}
-
-		public void setFxml(String fxml) {
-			this.fxml = fxml;
-		}
-		
-		@XmlAttribute
-		public String getId() {
-			return id;
-		}
-
-		public void setId(String id) {
-			this.id = id;
-		}
-
-		public static class ContentView {
-
-			private String id;
-
-			private String defaultView;
-
-			private Class controller;
-
-			private String resources;
-
-			private String fxml;
-
-			public ContentView() {
-			}
-
-			public Class getController() {
-				return controller;
-			}
-
-			public void setController(Class controller) {
-				this.controller = controller;
-			}
-
-			public String getResources() {
-				return resources;
-			}
-
-			public void setResources(String resources) {
-				this.resources = resources;
-			}
-
-			public String getFxml() {
-				return fxml;
-			}
-
-			public void setFxml(String fxml) {
-				this.fxml = fxml;
-			}
-
-			public String getDefaultView() {
-				return defaultView;
-			}
-
-			public void setDefaultView(String defaultView) {
-				this.defaultView = defaultView;
-			}
-
-			public String getId() {
-				return id;
-			}
-
-			public void setId(String id) {
-				this.id = id;
-			}
-		}
+		return this;
 	}
 }

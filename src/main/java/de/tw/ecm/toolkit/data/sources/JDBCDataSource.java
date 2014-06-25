@@ -8,12 +8,12 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import main.java.de.tw.ecm.toolkit.data.Attribute;
+import main.java.de.tw.ecm.toolkit.data.Attribute.Caption;
+import main.java.de.tw.ecm.toolkit.data.Attributes;
 import main.java.de.tw.ecm.toolkit.data.ECMProperties;
 import main.java.de.tw.ecm.toolkit.data.Entities;
 import main.java.de.tw.ecm.toolkit.data.Entity;
-import main.java.de.tw.ecm.toolkit.data.Entity.Attributes;
-import main.java.de.tw.ecm.toolkit.data.Entity.Attributes.Attribute;
-import main.java.de.tw.ecm.toolkit.data.Entity.Attributes.Attribute.Caption;
 import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.JDBCDataReader;
@@ -45,7 +45,6 @@ public class JDBCDataSource extends AbstractDataSource {
 			this.driver = properties.getProperty(DRIVER);
 			this.url = properties.getProperty(URL);
 			Class.forName(driver).newInstance();
-			this.entities = new Entities().build();
 		} catch (Exception e) {
 			throw new DataSourceException(e);
 		}
@@ -61,6 +60,14 @@ public class JDBCDataSource extends AbstractDataSource {
 		} catch (SQLException e) {
 			throw new DataSourceException(e);
 		}
+	}
+
+	@Override
+	public Entities getEntities() throws DataSourceException {
+		if (this.entities == null)
+			this.createEntities();
+
+		return this.entities;
 	}
 
 	@Override
@@ -109,7 +116,7 @@ public class JDBCDataSource extends AbstractDataSource {
 
 			while (rs.next()) {
 				tablename = rs.getString("TABLE_NAME");
-				entity = new Entity(this.repository, tablename);
+				entity = new Entity(tablename);
 				this.readColumnInfo(entity);
 				entities.add(entity);
 			}

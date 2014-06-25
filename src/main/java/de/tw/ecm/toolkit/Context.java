@@ -17,9 +17,9 @@ import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.prefs.PreferencesFactory;
 import main.java.de.tw.ecm.toolkit.prefs.SystemPreferences;
 import main.java.de.tw.ecm.toolkit.prefs.UserPreferences;
+import main.java.de.tw.ecm.toolkit.view.ContentView;
+import main.java.de.tw.ecm.toolkit.view.NavigationView;
 import main.java.de.tw.ecm.toolkit.view.View;
-import main.java.de.tw.ecm.toolkit.view.View.NavigationView;
-import main.java.de.tw.ecm.toolkit.view.View.NavigationView.ContentView;
 import main.java.de.tw.ecm.toolkit.view.Views;
 import main.java.de.tw.ecm.toolkit.view.system.LoginController;
 import main.java.de.tw.ecm.toolkit.view.system.MainController;
@@ -142,24 +142,19 @@ public class Context {
 				put(main);
 
 				Views views = new Views().build();
-
-				for (int i = 0; i < views.size(); i++) {
-					View view = views.get(i);
-					for (int j = 0; j < view.size(); j++) {
-						NavigationView navigationView = view.get(j);
+				for (View view : views) {
+					for (NavigationView navigationView : view) {
 						Pane navigationPane = replaceSceneContent(
-								navigationView.getController(),
+								navigationView.getControllerClass(),
 								navigationView.getResources(),
 								navigationView.getFxml());
 						String navigationViewCaption = ((AbstractUserController) get(navigationView
 								.getController())).getCaption();
 						main.addNavigationTab(navigationViewCaption,
 								navigationPane);
-
-						for (int k = 0; k < navigationView.size(); k++) {
-							ContentView contentView = navigationView.get(k);
+						for (ContentView contentView : navigationView) {
 							Pane contentPane = replaceSceneContent(
-									contentView.getController(),
+									contentView.getControllerClass(),
 									contentView.getResources(),
 									contentView.getFxml());
 							String contentPaneCaption = ((AbstractUserController) get(contentView

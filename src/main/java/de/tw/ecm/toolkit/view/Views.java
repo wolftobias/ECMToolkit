@@ -2,6 +2,7 @@ package main.java.de.tw.ecm.toolkit.view;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.JAXB;
@@ -12,7 +13,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.lang3.builder.Builder;
 
 @XmlRootElement(name = "views")
-public class Views implements Builder<Views> {
+public class Views implements Builder<Views>, Iterable<View> {
 
 	private ArrayList<View> cache = new ArrayList<>();
 
@@ -26,14 +27,14 @@ public class Views implements Builder<Views> {
 	}
 
 	public View getById(String id) {
-		for (int i = 0; i < cache.size(); i++) {
-			if (cache.get(i).getId().equals(id))
-				return cache.get(i);
+		for (View view : this.cache) {
+			if (view.getId().equals(id))
+				return view;
 		}
 
 		return null;
 	}
-	
+
 	@XmlElement(name = "view")
 	public List<View> getViews() {
 		return this.cache;
@@ -71,7 +72,20 @@ public class Views implements Builder<Views> {
 	}
 
 	@Override
+	public Iterator<View> iterator() {
+		return this.cache.iterator();
+	}
+
+	@Override
 	public Views build() {
-		return JAXB.unmarshal(new File("./systemPrefs.views.xml"), Views.class);
+		Views views = JAXB.unmarshal(new File("./systemPrefs.views.xml"),
+				Views.class);
+
+		for (View view : views) {
+			view.build();
+		}
+
+		return views;
+
 	}
 }

@@ -39,7 +39,7 @@ public class LoginController extends AbstractController {
 		try {
 			final Repositories repositories = new Repositories().build();
 			ObservableList<String> options = FXCollections
-					.observableArrayList(repositories.getRepositoryNames());
+					.observableArrayList(repositories.getRepositoryCaptions());
 			this.cmbRepository.setItems(options);
 			this.cmbRepository.setOnAction(new EventHandler<ActionEvent>() {
 				@Override

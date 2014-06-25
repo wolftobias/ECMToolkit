@@ -1,7 +1,50 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <repositories default="MySQL_ECMToolkit1">
-    <repository id="MySQL_ECMToolkit1" caption="MySQL ECMToolkit" class="main.java.de.tw.ecm.toolkit.data.sources.JDBCDataSource">
-        <property key="driver">com.mysql.jdbc.Driver</property>
-        <property key="url">jdbc:mysql://localhost:3306/ECMToolkit</property>
-    </repository>
+
+	<repository id="MySQL_ECMToolkit1" caption="MySQL ECMToolkit"
+		class="main.java.de.tw.ecm.toolkit.data.sources.JDBCDataSource">
+		<property key="driver">com.mysql.jdbc.Driver</property>
+		<property key="url">jdbc:mysql://localhost:3306/ECMToolkit</property>
+		<entities>
+			<entity id="MyTable">
+				<caption locale="de">Meine Tabelle</caption>
+				<attributes>
+					<attribute>
+						<name>ID</name>
+						<caption locale="de">Id</caption>
+					</attribute>
+					<attribute>
+						<name>StringCol</name>
+						<caption locale="de">String Spalte</caption>
+					</attribute>
+					<attribute>
+						<name>IntCol</name>
+						<caption locale="de">Int Spalte</caption>
+					</attribute>
+					<attribute>
+						<name>TimeStampCol</name>
+						<caption locale="de">TimeStamp Spalte</caption>
+					</attribute>
+					<attribute>
+						<name>DateTimeCol</name>
+						<caption locale="de">DateTime Spalte</caption>
+					</attribute>
+					<attribute>
+						<name>DateCol</name>
+						<caption locale="de">Date Spalte</caption>
+					</attribute>
+					<attribute>
+						<name>TimeCol</name>
+						<caption locale="de">Time Spalte</caption>
+					</attribute>
+				</attributes>
+			</entity>
+		</entities>
+	</repository>
+
+	<repository id="CM8_icmnlsdb" caption="CM8_icmnlsdb"
+		class="main.java.de.tw.ecm.toolkit.data.sources.CM8DataSource">
+		<property key="datastore">icmnlsdb</property>
+	</repository>
+
 </repositories>

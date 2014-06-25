@@ -1,6 +1,7 @@
 package main.java.de.tw.ecm.toolkit.data.sources;
 
 import main.java.de.tw.ecm.toolkit.data.ECMProperties;
+import main.java.de.tw.ecm.toolkit.data.Entities;
 import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 
@@ -28,6 +29,11 @@ public class CM8DataSource extends AbstractDataSource {
 			throws DataSourceException {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public Entities getEntities() throws DataSourceException {
+		return null;
 	}
 
 	@Override

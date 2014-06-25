@@ -26,10 +26,12 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
+import main.java.de.tw.ecm.toolkit.data.Attribute;
+import main.java.de.tw.ecm.toolkit.data.Attributes;
 import main.java.de.tw.ecm.toolkit.data.DataList;
 import main.java.de.tw.ecm.toolkit.data.DataRow;
 import main.java.de.tw.ecm.toolkit.data.Entity;
-import main.java.de.tw.ecm.toolkit.data.Entity.Attributes;
+import main.java.de.tw.ecm.toolkit.data.RepositoryException;
 import main.java.de.tw.ecm.toolkit.data.reader.CSVDataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
 import main.java.de.tw.ecm.toolkit.data.sources.DataSourceException;
@@ -83,14 +85,20 @@ public class QueryAnalyserController extends AbstractUserController {
 					@Override
 					public void changed(ObservableValue observable,
 							Object oldValue, Object newValue) {
-						TreeItem<String> selectedItem = (TreeItem<String>) newValue;
-						if (selectedItem.isLeaf()) {
-//							selectedEntity = selectedRepository.getEntities().getById(selectedItem.getValue());
-							String query = selectedEntity.getSelectQuery(null);
-							queryTextArea.setText(query);
-							toolBar.setDisable(false);
-						} else
-							toolBar.setDisable(true);
+						try {
+							TreeItem<String> selectedItem = (TreeItem<String>) newValue;
+							if (selectedItem.isLeaf()) {
+								String query = selectedRepository.getDataSource()
+										.defaultSelectQuery(
+												selectedItem.getValue(), null);
+								queryTextArea.setText(query);
+								toolBar.setDisable(false);
+								selectedEntity = selectedRepository.getEntities().getById(selectedItem.getValue());
+							} else
+								toolBar.setDisable(true);
+						} catch (RepositoryException e) {
+							handleException(e);
+						}
 					}
 				});
 	}
@@ -98,7 +106,7 @@ public class QueryAnalyserController extends AbstractUserController {
 	public void onPlay(ActionEvent event) {
 		try {
 			String query = queryTextArea.getText();
-			DataList dataList = this.selectedEntity.readList(query);
+			DataList dataList = this.selectedRepository.getDataSource().readList(query);
 			this.initDataTable(dataList);
 		} catch (DataSourceException e) {
 			this.handleException(e);
@@ -106,11 +114,14 @@ public class QueryAnalyserController extends AbstractUserController {
 	}
 
 	private void initDataTable(DataList data) {
+		// first clear all items
+		this.tableView.getColumns().clear();
+		
 		TableColumn column;
 		Attributes attributes = this.selectedEntity.getAttributes();
-
+		
 		for (int i = 0; i < attributes.size(); i++) {
-			final Attributes.Attribute attribute = attributes.get(i);
+			final Attribute attribute = attributes.get(i);
 			final int counter = i;
 			column = new TableColumn(attribute.getCaption().getText());
 			column.setCellValueFactory(new Callback<CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
@@ -155,7 +166,8 @@ public class QueryAnalyserController extends AbstractUserController {
 				.getString("export.fileChooser.title"));
 		fileChooser.getExtensionFilters().add(
 				new FileChooser.ExtensionFilter("CSV File", "*.csv"));
-		fileChooser.setInitialFileName(this.selectedEntity.getCaption().getText());
+		fileChooser.setInitialFileName(this.selectedEntity.getCaption()
+				.getText());
 		fileChooser.setInitialDirectory(selectedFile);
 		this.selectedFile = fileChooser.showSaveDialog(this.context
 				.getRootWindow());
@@ -172,8 +184,8 @@ public class QueryAnalyserController extends AbstractUserController {
 				csvDataWriter.writeHeader(captions);
 
 				for (int i = 0; i < items.size(); i++) {
-					ObservableList object = (ObservableList) items.get(i);
-					csvDataWriter.writeRow(object.toArray());
+					DataRow row = (DataRow) items.get(i);
+					csvDataWriter.writeRow(row);
 				}
 			} catch (WriterException e) {
 				this.handleException(e);

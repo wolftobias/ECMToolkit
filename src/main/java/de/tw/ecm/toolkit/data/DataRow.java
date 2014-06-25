@@ -30,4 +30,12 @@ public class DataRow {
 	public Object get(int i) {
 		return this.values.get(i);
 	}
+	
+	public Object[] toArray() {
+		return this.values.toArray();
+	}
+	
+	public List<Object> getValues() {
+		return this.values;
+	}
 }

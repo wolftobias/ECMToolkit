@@ -8,6 +8,8 @@ import java.io.OutputStream;
 
 import javax.xml.bind.JAXB;
 
+import main.java.de.tw.ecm.toolkit.view.ContentView;
+import main.java.de.tw.ecm.toolkit.view.NavigationView;
 import main.java.de.tw.ecm.toolkit.view.View;
 import main.java.de.tw.ecm.toolkit.view.Views;
 
@@ -27,6 +29,7 @@ public class ViewTest {
 		try {
 			File file = new File("./test_views.xml");
 			file.createNewFile();
+			file.deleteOnExit();
 
 			InputStream fileIn = new FileInputStream(file);
 			OutputStream fileOut = new FileOutputStream(file);
@@ -47,7 +50,26 @@ public class ViewTest {
 		view.setUser("*");
 		view.setGroup("*");
 		view.setDefault("DataSourceTree");
-		
+
+		NavigationView navigationView = new NavigationView();
+		navigationView
+				.setController("main.java.de.tw.ecm.toolkit.view.user.DataSourceExplorerController");
+		navigationView.setDefault("QueryAnalyser");
+		navigationView.setFxml("datasourceexplorer.fxml");
+		navigationView.setId("DataSourceTree");
+		navigationView.setResources("datasourceexplorer.properties");
+
+		ContentView contentView = new ContentView();
+		contentView
+				.setController("main.java.de.tw.ecm.toolkit.view.user.QueryAnalyserController");
+		contentView.setDefault("QueryAnalyser");
+		contentView.setFxml("queryanalyser.fxml");
+		contentView.setId("QueryAnalyser");
+		contentView.setResources("queryanalyser.properties");
+
+		navigationView.add(contentView);
+		view.add(navigationView);
+
 		Views views = new Views();
 		views.add(view);
 

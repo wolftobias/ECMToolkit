@@ -1,34 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ECMToolkit>
-	<entities>
-		<entity id="MyTable">
-			<caption locale="de">Meine Tabelle</caption>
-			<attributes>
-				<attribute>
-					<name>ID</name>
-					<caption locale="de">Id</caption>
-				</attribute>
-				<attribute>
-					<name>StringCol</name>
-					<caption locale="de">String Spalte</caption>
-				</attribute>
-				<attribute>
-					<name>TimeStampCol</name>
-					<caption locale="de">TimeStamp Spalte</caption>
-				</attribute>
-				<attribute>
-					<name>DateTimeCol</name>
-					<caption locale="de">DateTime Spalte</caption>
-				</attribute>
-				<attribute>
-					<name>DateCol</name>
-					<caption locale="de">Date Spalte</caption>
-				</attribute>
-				<attribute>
-					<name>TimeCol</name>
-					<caption locale="de">Time Spalte</caption>
-				</attribute>
-			</attributes>
-		</entity>
-	</entities>
-</ECMToolkit>
+<views>
+    <view id="QueryAnalyser" user="*" group="*" default="DataSourceTree">
+        <navigationviews>
+            <navigationview id="DataSourceTree" default="QueryAnalyser">
+                <controller>main.java.de.tw.ecm.toolkit.view.user.DataSourceExplorerController</controller>
+                <resources>datasourceexplorer.properties</resources>
+                <fxml>datasourceexplorer.fxml</fxml>
+                <contentviews>
+                    <contentview id="QueryAnalyser" default="QueryAnalyser">
+                        <controller>main.java.de.tw.ecm.toolkit.view.user.QueryAnalyserController</controller>
+                        <resources>queryanalyser.properties</resources>
+                        <fxml>queryanalyser.fxml</fxml>
+                    </contentview>
+                </contentviews>
+            </navigationview>
+        </navigationviews>
+    </view>
+</views>

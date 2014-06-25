@@ -2,17 +2,17 @@ package main.java.de.tw.ecm.toolkit.data;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.JAXB;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.builder.Builder;
 
 @XmlType(name = "entities")
-public class Entities implements Builder<Entities> {
+public class Entities implements Builder<Entities>, Iterable<Entity> {
 
 	private static final String LOCAL_STRATEGY = "LOCAL_STRATEGY";
 	private static final String REPOSITORY_STRATEGY = "REPOSITORY_STRATEGY";
@@ -30,18 +30,18 @@ public class Entities implements Builder<Entities> {
 	}
 
 	public Entity getByCaption(String caption) {
-		for (int i = 0; i < cache.size(); i++) {
-			if (cache.get(i).getCaption().equals(caption))
-				return cache.get(i);
+		for (Entity entity : this.cache) {
+			if (entity.getCaption().getText().equalsIgnoreCase(caption))
+				return entity;
 		}
 
 		return null;
 	}
 
 	public Entity getById(String id) {
-		for (int i = 0; i < cache.size(); i++) {
-			if (cache.get(i).getId().equals(id))
-				return cache.get(i);
+		for (Entity entity : this.cache) {
+			if (entity.getId().equalsIgnoreCase(id))
+				return entity;
 		}
 
 		return null;
@@ -71,8 +71,12 @@ public class Entities implements Builder<Entities> {
 	}
 
 	@Override
+	public Iterator<Entity> iterator() {
+		return this.cache.iterator();
+	}
+
+	@Override
 	public Entities build() {
-		return JAXB.unmarshal(new File("./systemPrefs.entities.xml"),
-				Entities.class);
+		return this;
 	}
 }
