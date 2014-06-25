@@ -40,7 +40,6 @@ public abstract class AbstractController implements Initializable {
 		try {
 			this.selectedRepository = this.context.getSystemPrefs()
 					.getRepositories().getSelectedRepository();
-			this.currentDataSource = this.context.getCurrentDataSource();
 		} catch (Exception e) {
 			this.handleException(e);
 		}

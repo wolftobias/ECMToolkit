@@ -53,9 +53,7 @@ public class LoginController extends AbstractController {
 					} catch (RepositoryException e1) {
 						handleException(e1);
 					}
-					currentDataSource = selectedRepository.getDataSource();
 					context.setSelectedRepository(selectedRepository);
-					context.setCurrentDataSource(currentDataSource);
 				}
 			});
 
@@ -77,7 +75,7 @@ public class LoginController extends AbstractController {
 
 	public void onLogin(ActionEvent event) {
 		try {
-			boolean login = this.currentDataSource.login(
+			boolean login = this.selectedRepository.getDataSource().login(
 					this.txtUsername.getText(), this.pwdPassword.getText());
 
 			if (login) {

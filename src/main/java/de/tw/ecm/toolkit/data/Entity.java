@@ -2,7 +2,9 @@ package main.java.de.tw.ecm.toolkit.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
+import main.java.de.tw.ecm.toolkit.data.Entity.Attributes.Attribute;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 import main.java.de.tw.ecm.toolkit.data.sources.DataSource;
 import main.java.de.tw.ecm.toolkit.data.sources.DataSourceException;
@@ -10,8 +12,6 @@ import main.java.de.tw.ecm.toolkit.data.sources.DataSourceException;
 public class Entity {
 
 	private Repository repository;
-
-	private DataSource dataSource;
 
 	private String caption;
 
@@ -22,27 +22,18 @@ public class Entity {
 	public Entity() {
 	}
 
+	public Entity(Repository repository, String id) {
+		this.repository = repository;
+		this.id = id;
+		this.caption = id;
+	}
+
 	public Repository getRepository() {
 		return repository;
 	}
 
 	public void setRepository(Repository repository) {
 		this.repository = repository;
-	}
-
-	public DataSource getDataSource() {
-		return dataSource;
-	}
-
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
-
-	public Entity(Repository repository, DataSource dataSource, String id) {
-		this.repository = repository;
-		this.dataSource = dataSource;
-		this.id = id;
-		this.caption = id;
 	}
 
 	public String getCaption() {
@@ -74,15 +65,15 @@ public class Entity {
 	}
 
 	public String getSelectQuery(String... attributes) {
-		return this.dataSource.defaultSelectQuery(this.id, attributes);
+		return this.repository.getDataSource().defaultSelectQuery(this.id, attributes);
 	}
 
 	public DataList readList(String query) throws DataSourceException {
-		return this.dataSource.readList(query);
+		return this.repository.getDataSource().readList(query);
 	}
 
 	public DataReader select(String query) throws DataSourceException {
-		return this.dataSource.read(query);
+		return this.repository.getDataSource().read(query);
 	}
 
 	public class Attributes {
@@ -123,75 +114,109 @@ public class Entity {
 		public String[] getCaptions() {
 			String[] captions = new String[this.size()];
 			for (int i = 0; i < captions.length; i++) {
-				captions[i] = this.get(i).getCaption();
+				captions[i] = this.get(i).getCaption().getText();
 			}
 
 			return captions;
 		}
-	}
 
-	public class Attribute {
+		public class Attribute {
 
-		private String name;
+			private String name;
 
-		private String caption;
+			private Caption caption;
 
-		private String type;
+			private String type;
 
-		private int size;
+			private int size;
 
-		private String nativeType;
+			private String nativeType;
 
-		public Attribute() {
+			public Attribute() {
+			}
+
+			public Attribute(String name) {
+				this.name = name;
+			}
+
+			public String getName() {
+				return name;
+			}
+
+			public void setName(String name) {
+				this.name = name;
+			}
+
+			public Caption getCaption() {
+				return caption;
+			}
+
+			public void setCaption(Caption caption) {
+				this.caption = caption;
+			}
+
+			public String getType() {
+				return type;
+			}
+
+			public void setType(String type) {
+				this.type = type;
+			}
+
+			public Class getTypeClass() throws ClassNotFoundException {
+				return Class.forName(this.getType());
+			}
+
+			public int getSize() {
+				return size;
+			}
+
+			public void setSize(int size) {
+				this.size = size;
+			}
+
+			public String getNativeType() {
+				return nativeType;
+			}
+
+			public void setNativeType(String nativeType) {
+				this.nativeType = nativeType;
+			}
+			
+			public class Caption {
+				
+				private String text;
+				
+				private Locale locale;
+				
+				public Caption() {
+				}
+				
+				public Caption(String text) {
+					this.text = text;
+				}
+				
+				public Caption(String text, Locale locale) {
+					this.text = text;
+					this.locale = locale;
+				}
+
+				public String getText() {
+					return text;
+				}
+
+				public void setText(String text) {
+					this.text = text;
+				}
+
+				public Locale getLocale() {
+					return locale;
+				}
+
+				public void setLocale(Locale locale) {
+					this.locale = locale;
+				}
+			}
 		}
-
-		public Attribute(String name) {
-			this.name = name;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
-
-		public String getCaption() {
-			return caption;
-		}
-
-		public void setCaption(String caption) {
-			this.caption = caption;
-		}
-
-		public String getType() {
-			return type;
-		}
-
-		public void setType(String type) {
-			this.type = type;
-		}
-
-		public Class getTypeClass() throws ClassNotFoundException {
-			return Class.forName(this.getType());
-		}
-
-		public int getSize() {
-			return size;
-		}
-
-		public void setSize(int size) {
-			this.size = size;
-		}
-
-		public String getNativeType() {
-			return nativeType;
-		}
-
-		public void setNativeType(String nativeType) {
-			this.nativeType = nativeType;
-		}
-
 	}
 }

@@ -34,12 +34,6 @@ public class CM8DataSource extends AbstractDataSource {
 	}
 
 	@Override
-	public Entities getEntities() throws DataSourceException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public void create() throws DataSourceException {
 		// TODO Auto-generated method stub
 		

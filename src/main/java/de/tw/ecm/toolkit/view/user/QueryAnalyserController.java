@@ -29,7 +29,6 @@ import javafx.util.Callback;
 import main.java.de.tw.ecm.toolkit.data.DataList;
 import main.java.de.tw.ecm.toolkit.data.DataRow;
 import main.java.de.tw.ecm.toolkit.data.Entity;
-import main.java.de.tw.ecm.toolkit.data.Entity.Attribute;
 import main.java.de.tw.ecm.toolkit.data.Entity.Attributes;
 import main.java.de.tw.ecm.toolkit.data.reader.CSVDataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
@@ -63,7 +62,7 @@ public class QueryAnalyserController extends AbstractUserController {
 	private TextArea queryTextArea;
 
 	@FXML
-	private TableView tableView;
+	private TableView<DataRow> tableView;
 
 	private Entity selectedEntity;
 
@@ -86,55 +85,47 @@ public class QueryAnalyserController extends AbstractUserController {
 							Object oldValue, Object newValue) {
 						TreeItem<String> selectedItem = (TreeItem<String>) newValue;
 						if (selectedItem.isLeaf()) {
-							try {
-								selectedEntity = currentDataSource
-										.getEntities().getById(
-												selectedItem.getValue());
-								String query = selectedEntity
-										.getSelectQuery(null);
-								queryTextArea.setText(query);
-								toolBar.setDisable(false);
-							} catch (DataSourceException e) {
-								handleException(e);
-							}
+							selectedEntity = selectedRepository.getEntities()
+									.getById(selectedItem.getValue());
+							String query = selectedEntity.getSelectQuery(null);
+							queryTextArea.setText(query);
+							toolBar.setDisable(false);
 						} else
 							toolBar.setDisable(true);
 					}
-
 				});
-
 	}
 
 	public void onPlay(ActionEvent event) {
 		try {
 			String query = queryTextArea.getText();
 			DataList dataList = this.selectedEntity.readList(query);
-			this.initDataTable(dataList.toObservableList());
+			this.initDataTable(dataList);
 		} catch (DataSourceException e) {
 			this.handleException(e);
 		}
 	}
 
-	private void initDataTable(ObservableList data) {
+	private void initDataTable(DataList data) {
 		TableColumn column;
 		Attributes attributes = this.selectedEntity.getAttributes();
 
 		for (int i = 0; i < attributes.size(); i++) {
-			final Attribute attribute = attributes.get(i);
+			final Attributes.Attribute attribute = attributes.get(i);
 			final int counter = i;
-			column = new TableColumn(attribute.getCaption());
+			column = new TableColumn(attribute.getCaption().getText());
 			column.setCellValueFactory(new Callback<CellDataFeatures<ObservableList, String>, ObservableValue<String>>() {
 				public ObservableValue<String> call(
 						CellDataFeatures<ObservableList, String> param) {
-					return new SimpleStringProperty(param.getValue()
-							.get(counter).toString());
+					DataRow row = (DataRow) param.getValue();
+					return new SimpleStringProperty(row.get(counter).toString());
 				}
 			});
 
 			this.tableView.getColumns().add(column);
 		}
 
-		this.tableView.setItems(data);
+		this.tableView.setItems(data.toObservableList());
 	}
 
 	public void onImport(ActionEvent event) {

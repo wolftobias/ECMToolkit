@@ -27,8 +27,10 @@ public abstract class AbstractDataSource implements DataSource {
 
 		return dataList;
 	}
-
-	private void closeQuietly(DataReader reader) {
+	
+	
+	
+	protected void closeQuietly(DataReader reader) {
 		try {
 			if (reader != null)
 				reader.close();

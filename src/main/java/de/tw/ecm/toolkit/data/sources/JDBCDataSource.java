@@ -13,8 +13,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import main.java.de.tw.ecm.toolkit.data.Entities;
 import main.java.de.tw.ecm.toolkit.data.Entity;
+import main.java.de.tw.ecm.toolkit.data.Entity.Attributes;
 import main.java.de.tw.ecm.toolkit.data.Repository;
-import main.java.de.tw.ecm.toolkit.data.Entity.Attribute;
+import main.java.de.tw.ecm.toolkit.data.Entity.Attributes.Attribute;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.JDBCDataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
@@ -45,6 +46,7 @@ public class JDBCDataSource extends AbstractDataSource {
 			this.driver = properties.getProperty(DRIVER);
 			this.url = properties.getProperty(URL);
 			Class.forName(driver).newInstance();
+			this.entities = repository.getEntities();
 		} catch (Exception e) {
 			throw new DataSourceException(e);
 		}
@@ -60,14 +62,6 @@ public class JDBCDataSource extends AbstractDataSource {
 		} catch (SQLException e) {
 			throw new DataSourceException(e);
 		}
-	}
-
-	@Override
-	public Entities getEntities() throws DataSourceException {
-		if (this.entities == null)
-			this.createEntities();
-
-		return this.entities;
 	}
 
 	@Override
@@ -116,7 +110,7 @@ public class JDBCDataSource extends AbstractDataSource {
 
 			while (rs.next()) {
 				tablename = rs.getString("TABLE_NAME");
-				entity = new Entity(this.repository, this, tablename);
+				entity = new Entity(this.repository, tablename);
 				this.readColumnInfo(entity);
 				entities.add(entity);
 			}
@@ -129,7 +123,8 @@ public class JDBCDataSource extends AbstractDataSource {
 	}
 
 	private void readColumnInfo(Entity entity) throws SQLException {
-		Attribute attr;
+		Attribute attribute;
+		Attributes attributes = entity.new Attributes();
 		PreparedStatement prepareStatement = this.connection
 				.prepareStatement("SELECT * FROM " + entity.getId());
 		ResultSet rs = prepareStatement.executeQuery();
@@ -138,20 +133,22 @@ public class JDBCDataSource extends AbstractDataSource {
 		try {
 			int columnCount = rsmd.getColumnCount();
 			for (int i = 1; i <= columnCount; i++) {
-				attr = entity.new Attribute();
+				attribute = attributes.new Attribute();
 				String columnLabel = rsmd.getColumnLabel(i);
-				attr.setCaption(columnLabel);
+				attribute.setCaption(attribute.new Caption(columnLabel));
 				String columnName = rsmd.getColumnName(i);
-				attr.setName(columnName);
+				attribute.setName(columnName);
 				String columnClassName = rsmd.getColumnClassName(i);
-				attr.setType(columnClassName);
+				attribute.setType(columnClassName);
 				String columnNativeType = rsmd.getColumnTypeName(i);
-				attr.setNativeType(columnNativeType);
+				attribute.setNativeType(columnNativeType);
 				int columnDisplaySize = rsmd.getColumnDisplaySize(i);
-				attr.setSize(columnDisplaySize);
+				attribute.setSize(columnDisplaySize);
 
-				entity.addAttribute(attr);
+				attributes.add(attribute);
 			}
+			
+			entity.setAttributes(attributes);
 		} finally {
 			rs.close();
 		}

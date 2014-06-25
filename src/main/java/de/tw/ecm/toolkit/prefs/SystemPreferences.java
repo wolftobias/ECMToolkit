@@ -6,12 +6,18 @@
 package main.java.de.tw.ecm.toolkit.prefs;
 
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import main.java.de.tw.ecm.toolkit.data.Entities;
+import main.java.de.tw.ecm.toolkit.data.Entity;
+import main.java.de.tw.ecm.toolkit.data.Entity.Attributes;
+import main.java.de.tw.ecm.toolkit.data.Entity.Attributes.Attribute;
+import main.java.de.tw.ecm.toolkit.data.Entity.Attributes.Attribute.Caption;
 import main.java.de.tw.ecm.toolkit.data.Repositories;
 import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.data.RepositoryException;
@@ -64,7 +70,7 @@ public class SystemPreferences {
 	}
 
 	private void parseRepositories() throws RepositoryException {
-		Repository temp;
+		Repository repository;
 
 		Node reposNode = document.getElementsByTagName("Repositories").item(0);
 		NodeList reposNodes = reposNode.getChildNodes();
@@ -79,27 +85,108 @@ public class SystemPreferences {
 			if (repoNode.getNodeType() == Node.ELEMENT_NODE) {
 
 				Element repoElement = (Element) repoNode;
-				temp = new Repository();
-				temp.setCaption(repoElement.getAttribute("caption"));
-				temp.setId(repoElement.getAttribute("id"));
+				repository = new Repository();
+				repository.setCaption(repoElement.getAttribute("caption"));
+				repository.setId(repoElement.getAttribute("id"));
 				try {
 					Class dataSource = Class.forName(repoElement
 							.getAttribute("class"));
-					temp.setImplementationClass(dataSource);
+					repository.setImplementationClass(dataSource);
 				} catch (ClassNotFoundException e) {
 					throw new RepositoryException(e);
 				}
 
-				NodeList repoPropsNodes = repoNode.getChildNodes();
-				for (int j = 0; j < repoPropsNodes.getLength(); j++) {
-					Node repoPropNode = repoPropsNodes.item(j);
-					if (repoPropNode.getNodeType() == Node.ELEMENT_NODE) {
-						temp.setProperty(repoPropNode.getNodeName(),
-								repoPropNode.getTextContent());
+				this.parseRepository(repository, repoNode.getChildNodes());
+				this.repositories.add(repository);
+			}
+		}
+	}
+
+	private void parseRepository(Repository repository, NodeList repoPropsNodes)
+			throws RepositoryException {
+		for (int i = 0; i < repoPropsNodes.getLength(); i++) {
+			Node repoPropNode = repoPropsNodes.item(i);
+			if (repoPropNode.getNodeType() == Node.ELEMENT_NODE) {
+				String nodeName = repoPropNode.getNodeName();
+				if (nodeName.equalsIgnoreCase("Entities"))
+					this.parseEntities(repository);
+				else
+					repository.setProperty(repoPropNode.getNodeName(),
+							repoPropNode.getTextContent());
+			}
+		}
+	}
+
+	private void parseEntities(Repository repository)
+			throws RepositoryException {
+		Entities entities = new Entities();
+		Entity entity;
+
+		Node entitiesNode = document.getElementsByTagName("Entities").item(0);
+		NodeList entityNodes = entitiesNode.getChildNodes();
+
+		for (int i = 0; i < entityNodes.getLength(); i++) {
+
+			Node entityNode = entityNodes.item(i);
+			if (entityNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element entityElement = (Element) entityNode;
+				String id = entityElement.getAttribute("id");
+				entity = new Entity(repository, id);
+				this.parseEntity(entity, entityNode.getChildNodes());
+				entities.add(entity);
+			}
+		}
+
+		repository.setEntities(entities);
+	}
+
+	private void parseEntity(Entity entity, NodeList entityNodes)
+			throws RepositoryException {
+		Attributes attributes = entity.new Attributes();
+
+		for (int i = 0; i < entityNodes.getLength(); i++) {
+			Node entityNode = entityNodes.item(i);
+			if (entityNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element entityElement = (Element) entityNode;
+				String nodeName = entityElement.getNodeName();
+				if (nodeName.equalsIgnoreCase("Attributes")) {
+					this.parseAttributes(attributes,
+							entityElement.getChildNodes());
+				} else
+					entity.setCaption(entityElement.getNodeValue());
+			}
+			entity.setAttributes(attributes);
+		}
+	}
+
+	private void parseAttributes(Attributes attributes, NodeList attributesNodes)
+			throws RepositoryException {
+		Attribute attribute;
+
+		for (int i = 0; i < attributesNodes.getLength(); i++) {
+			NodeList attributeNodes = attributesNodes.item(i).getChildNodes();
+			attribute = attributes.new Attribute();
+			
+			if(attributeNodes.getLength() > 0) {
+				attributes.add(attribute);
+			}
+			
+			for (int j = 0; j < attributeNodes.getLength(); j++) {
+				Node attributeNode = attributeNodes.item(j);
+				if (attributeNode.getNodeType() == Node.ELEMENT_NODE) {
+					Element attributeElement = (Element) attributeNode;
+					String nodeName = attributeElement.getNodeName();
+					if (nodeName.equalsIgnoreCase("name")) {
+						attribute.setName(attributeElement.getTextContent());
+					} else if (nodeName.equalsIgnoreCase("caption")) {
+						Caption caption = attribute.new Caption();
+						Locale locale = new Locale(
+								attributeElement.getAttribute("locale"));
+						caption.setLocale(locale);
+						caption.setText(attributeElement.getTextContent());
+						attribute.setCaption(caption);
 					}
 				}
-
-				this.repositories.add(temp);
 			}
 		}
 	}

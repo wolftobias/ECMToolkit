@@ -18,7 +18,9 @@ public class Repository {
 	private Properties properties = new Properties();
 
 	private DataSource dataSource;
-
+	
+	Entities entities;
+	
 	public Repository() {
 	}
 
@@ -64,6 +66,14 @@ public class Repository {
 
 	public DataSource getDataSource() {
 		return dataSource;
+	}
+
+	public Entities getEntities() {
+		return entities;
+	}
+
+	public void setEntities(Entities entities) {
+		this.entities = entities;
 	}
 
 	public void initialize() throws RepositoryException {

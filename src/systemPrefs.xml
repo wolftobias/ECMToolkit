@@ -2,49 +2,48 @@
 
 <ECMToolkit>
 	<Repositories default="MySQL_ECMToolkit1">
-		<Repository class="main.java.de.tw.ecm.toolkit.data.JDBCDataSource"
+		<Repository class="main.java.de.tw.ecm.toolkit.data.sources.JDBCDataSource"
 			id="MySQL_ECMToolkit1" caption="MySQL_ECMToolkit">
 			<driver>com.mysql.jdbc.Driver</driver>
 			<url>jdbc:mysql://localhost:3306/ECMToolkit</url>
+			<Entities>
+				<Entity id="MyTable">
+					<caption locale="de">Meine Tabelle</caption>
+					<Attributes>
+						<Attribute>
+							<Name>ID</Name>
+							<Caption locale="de">Id</Caption>
+						</Attribute>
+						<Attribute>
+							<Name>StringCol</Name>
+							<Caption locale="de">String Spalte</Caption>
+						</Attribute>
+						<Attribute>
+							<Name>TimeStampCol</Name>
+							<Caption locale="de">TimeStamp Spalte</Caption>
+						</Attribute>
+						<Attribute>
+							<Name>DateTimeCol</Name>
+							<Caption locale="de">DateTime Spalte</Caption>
+						</Attribute>
+						<Attribute>
+							<Name>DateCol</Name>
+							<Caption locale="de">DateCol Spalte</Caption>
+						</Attribute>
+						<Attribute>
+							<Name>TimeCol</Name>
+							<Caption locale="de">TimeCol Spalte</Caption>
+						</Attribute>
+					</Attributes>
+				</Entity>
+			</Entities>
 		</Repository>
 
-		<Repository class="main.java.de.tw.ecm.toolkit.data.CM8DataSource"
+		<Repository class="main.java.de.tw.ecm.toolkit.data.sources.CM8DataSource"
 			id="CM8_icmnlsdb1" caption="CM8_icmnlsdb">
 			<datastore>icmnlsdb</datastore>
 		</Repository>
 	</Repositories>
-
-	<Entities>
-		<Entity id="MyTable" repositoryID="" strategy="local">
-			<caption locale="de" />
-			<Attributes>
-				<Attribute>
-					<Name>ID</Name>
-					<Caption locale="de">Id</Caption>
-				</Attribute>
-				<Attribute>
-					<Name>StringCol</Name>
-					<Caption locale="de">String Spalte</Caption>
-				</Attribute>
-				<Attribute>
-					<Name>TimeStampCol</Name>
-					<Caption locale="de">TimeStamp Spalte</Caption>
-				</Attribute>
-				<Attribute>
-					<Name>DateTimeCol</Name>
-					<Caption locale="de">DateTime Spalte</Caption>
-				</Attribute>
-				<Attribute>
-					<Name>DateCol</Name>
-					<Caption locale="de">DateCol Spalte</Caption>
-				</Attribute>
-				<Attribute>
-					<Name>TimeCol</Name>
-					<Caption locale="de">TimeCol Spalte</Caption>
-				</Attribute>
-			</Attributes>
-		</Entity>
-	</Entities>
 
 	<Views default="QueryAnalyser">
 		<View id="QueryAnalyser" user="*" group="*" default="DataSourceTree">
