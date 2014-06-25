@@ -34,15 +34,15 @@ public class UserPreferences {
 	private Document document;
 
 	protected UserPreferences() {
-		try {
-			InputStream is = SystemPreferences.class
-					.getResourceAsStream("/userPrefs.xml");
-			DocumentBuilder documentBuilder = DocumentBuilderFactory
-					.newInstance().newDocumentBuilder();
-			document = documentBuilder.parse(is);
-
-		} catch (Exception e) {
-			log.log(Level.SEVERE, e.getMessage(), e);
-		}
+//		try {
+//			InputStream is = SystemPreferences.class
+//					.getResourceAsStream("/userPrefs.xml");
+//			DocumentBuilder documentBuilder = DocumentBuilderFactory
+//					.newInstance().newDocumentBuilder();
+//			document = documentBuilder.parse(is);
+//
+//		} catch (Exception e) {
+//			log.log(Level.SEVERE, e.getMessage(), e);
+//		}
 	}
 }

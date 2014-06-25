@@ -1,9 +1,6 @@
 package main.java.de.tw.ecm.toolkit.data.sources;
 
-import java.util.Properties;
-
-import javafx.collections.ObservableList;
-import main.java.de.tw.ecm.toolkit.data.Entities;
+import main.java.de.tw.ecm.toolkit.data.ECMProperties;
 import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 
@@ -14,16 +11,16 @@ public class CM8DataSource extends AbstractDataSource {
 	}
 
 	@Override
-	public void initialize(Repository repository, Properties properties)
+	public void initialize(Repository repository, ECMProperties properties)
 			throws DataSourceException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void destroy() throws DataSourceException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -36,7 +33,7 @@ public class CM8DataSource extends AbstractDataSource {
 	@Override
 	public void create() throws DataSourceException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -48,13 +45,13 @@ public class CM8DataSource extends AbstractDataSource {
 	@Override
 	public void update(Object[] items) throws DataSourceException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void delete(Object[] items) throws DataSourceException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

@@ -1,37 +1,42 @@
 package main.java.de.tw.ecm.toolkit.data;
 
-import java.util.Properties;
+import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import main.java.de.tw.ecm.toolkit.data.sources.DataSource;
 
-@XmlRootElement(name = "Repository")
+@XmlType(propOrder = { "id", "caption", "properties" })
 public class Repository {
 
-	private Class<DataSource> implementationClass;
+	private Class implementationClass;
 
 	private String caption;
 
 	private String id;
-
-	private Properties properties = new Properties();
+	
+	private ECMProperties properties = new ECMProperties();
 
 	private DataSource dataSource;
-	
-	Entities entities;
-	
+
+	private String dataSourceClassname;
+
 	public Repository() {
 	}
 
-	public Class<DataSource> getImplementationClass() {
+	@XmlTransient
+	public Class<DataSource> getDataSourceClass() {
 		return implementationClass;
 	}
 
-	public void setImplementationClass(Class<DataSource> implementationClass) {
+	public void setDataSourceClass(Class<DataSource> implementationClass) {
 		this.implementationClass = implementationClass;
 	}
 
+	@XmlAttribute
 	public String getCaption() {
 		return caption;
 	}
@@ -40,6 +45,7 @@ public class Repository {
 		this.caption = caption;
 	}
 
+	@XmlAttribute
 	public String getId() {
 		return id;
 	}
@@ -48,11 +54,12 @@ public class Repository {
 		this.id = id;
 	}
 
-	public Properties getProperties() {
-		return properties;
+	@XmlElement(name="property")
+	public List<ECMProperty> getProperties() {
+		return properties.getProperties();
 	}
 
-	public void setProperties(Properties properties) {
+	public void setProperties(ECMProperties properties) {
 		this.properties = properties;
 	}
 
@@ -68,16 +75,18 @@ public class Repository {
 		return dataSource;
 	}
 
-	public Entities getEntities() {
-		return entities;
+	@XmlAttribute(name = "class")
+	public String getDataSourceClassname() {
+		return dataSourceClassname;
 	}
 
-	public void setEntities(Entities entities) {
-		this.entities = entities;
+	public void setDataSourceClassname(String dataSourceClassname) {
+		this.dataSourceClassname = dataSourceClassname;
 	}
 
 	public void initialize() throws RepositoryException {
 		try {
+			this.implementationClass = Class.forName(dataSourceClassname);
 			this.dataSource = (DataSource) implementationClass.newInstance();
 			this.dataSource.initialize(this, this.properties);
 		} catch (Exception e) {

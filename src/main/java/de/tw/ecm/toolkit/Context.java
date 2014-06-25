@@ -141,7 +141,7 @@ public class Context {
 						MainController.class, "main");
 				put(main);
 
-				Views views = systemPrefs.getViews();
+				Views views = new Views().build();
 
 				for (int i = 0; i < views.size(); i++) {
 					View view = views.get(i);

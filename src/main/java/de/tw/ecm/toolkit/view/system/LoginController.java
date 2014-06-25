@@ -37,8 +37,7 @@ public class LoginController extends AbstractController {
 	public void initialize(URL location, ResourceBundle resources) {
 		super.initialize(location, resources);
 		try {
-			final Repositories repositories = this.context.getSystemPrefs()
-					.getRepositories();
+			final Repositories repositories = new Repositories().build();
 			ObservableList<String> options = FXCollections
 					.observableArrayList(repositories.getRepositoryNames());
 			this.cmbRepository.setItems(options);

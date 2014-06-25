@@ -1,8 +1,18 @@
 package main.java.de.tw.ecm.toolkit.view;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
-public class Views {
+import javax.xml.bind.JAXB;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.apache.commons.lang3.builder.Builder;
+
+@XmlRootElement(name = "views")
+public class Views implements Builder<Views> {
 
 	private ArrayList<View> cache = new ArrayList<>();
 
@@ -23,9 +33,10 @@ public class Views {
 
 		return null;
 	}
-
-	public View[] getViews() {
-		return (View[]) this.cache.toArray(new View[cache.size()]);
+	
+	@XmlElement(name = "view")
+	public List<View> getViews() {
+		return this.cache;
 	}
 
 	public void add(View View) {
@@ -44,7 +55,23 @@ public class Views {
 		return this.getById(this.defaultView);
 	}
 
-	public void setDefaultView(String defaultView) {
+	@XmlAttribute
+	public String getDefault() {
+		return this.defaultView;
+	}
+
+	public void setDefault(String defaultView) {
 		this.defaultView = defaultView;
+	}
+
+	public String toXml() {
+		String xml = "";
+		JAXB.marshal(this, xml);
+		return xml;
+	}
+
+	@Override
+	public Views build() {
+		return JAXB.unmarshal(new File("./systemPrefs.views.xml"), Views.class);
 	}
 }

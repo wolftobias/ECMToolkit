@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<repositories default="MySQL_ECMToolkit1">
+    <repository id="MySQL_ECMToolkit1" caption="MySQL ECMToolkit" class="main.java.de.tw.ecm.toolkit.data.sources.JDBCDataSource">
+        <property key="driver">com.mysql.jdbc.Driver</property>
+        <property key="url">jdbc:mysql://localhost:3306/ECMToolkit</property>
+    </repository>
+</repositories>

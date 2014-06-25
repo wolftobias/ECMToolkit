@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import javafx.fxml.Initializable;
 import main.java.de.tw.ecm.toolkit.Context;
+import main.java.de.tw.ecm.toolkit.data.Repositories;
 import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.data.sources.DataSource;
 
@@ -38,8 +39,7 @@ public abstract class AbstractController implements Initializable {
 		this.context.put(this);
 		
 		try {
-			this.selectedRepository = this.context.getSystemPrefs()
-					.getRepositories().getSelectedRepository();
+			this.selectedRepository = new Repositories().build().getSelectedRepository();
 		} catch (Exception e) {
 			this.handleException(e);
 		}

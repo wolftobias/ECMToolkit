@@ -36,7 +36,7 @@ public class DataSourceExplorerController extends AbstractUserController {
 	}
 
 	private void setupTree() {
-		Entities entities = this.selectedRepository.getEntities();
+		Entities entities = new Entities().build();
 		TreeItem<String> rootItem = new TreeItem<String>(
 				this.selectedRepository.getCaption());
 		rootItem.setExpanded(true);

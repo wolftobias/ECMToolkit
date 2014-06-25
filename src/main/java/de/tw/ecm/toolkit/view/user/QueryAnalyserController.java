@@ -85,8 +85,7 @@ public class QueryAnalyserController extends AbstractUserController {
 							Object oldValue, Object newValue) {
 						TreeItem<String> selectedItem = (TreeItem<String>) newValue;
 						if (selectedItem.isLeaf()) {
-							selectedEntity = selectedRepository.getEntities()
-									.getById(selectedItem.getValue());
+//							selectedEntity = selectedRepository.getEntities().getById(selectedItem.getValue());
 							String query = selectedEntity.getSelectQuery(null);
 							queryTextArea.setText(query);
 							toolBar.setDisable(false);
@@ -156,7 +155,7 @@ public class QueryAnalyserController extends AbstractUserController {
 				.getString("export.fileChooser.title"));
 		fileChooser.getExtensionFilters().add(
 				new FileChooser.ExtensionFilter("CSV File", "*.csv"));
-		fileChooser.setInitialFileName(this.selectedEntity.getCaption());
+		fileChooser.setInitialFileName(this.selectedEntity.getCaption().getText());
 		fileChooser.setInitialDirectory(selectedFile);
 		this.selectedFile = fileChooser.showSaveDialog(this.context
 				.getRootWindow());

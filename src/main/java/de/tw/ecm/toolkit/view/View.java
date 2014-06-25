@@ -3,6 +3,11 @@ package main.java.de.tw.ecm.toolkit.view;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
+@XmlType(propOrder = { "id", "user", "group", "default" })
 public class View {
 
 	private String id;
@@ -29,13 +34,9 @@ public class View {
 	public NavigationView get(int i) {
 		return this.cache.get(i);
 	}
-
+	
 	public NavigationView getDefaultNavigationView() {
 		return this.getById(this.defaultView);
-	}
-
-	public void setDefaultNavigationView(String defaultView) {
-		this.defaultView = defaultView;
 	}
 
 	public NavigationView getById(String id) {
@@ -46,7 +47,8 @@ public class View {
 
 		return null;
 	}
-
+	
+	@XmlAttribute
 	public String getId() {
 		return id;
 	}
@@ -55,6 +57,7 @@ public class View {
 		this.id = id;
 	}
 
+	@XmlAttribute
 	public String getUser() {
 		return user;
 	}
@@ -62,7 +65,8 @@ public class View {
 	public void setUser(String user) {
 		this.user = user;
 	}
-
+	
+	@XmlAttribute
 	public String getGroup() {
 		return group;
 	}
@@ -70,8 +74,18 @@ public class View {
 	public void setGroup(String group) {
 		this.group = group;
 	}
+	
+	@XmlAttribute
+	public String getDefault() {
+		return defaultView;
+	}
 
-	public class NavigationView {
+	public void setDefault(String defaultView) {
+		this.defaultView = defaultView;
+	}
+	
+	@XmlType(propOrder = { "id", "controller", "resources", "fxml", "default" })
+	public static class NavigationView {
 
 		private String id;
 
@@ -108,12 +122,17 @@ public class View {
 
 			return null;
 		}
-
+		
 		public ContentView getDefaultContentView() {
 			return this.getById(this.defaultView);
 		}
-
-		public void setDefaultContentView(String defaultView) {
+		
+		@XmlAttribute(name="default")		
+		public String getDefault() {
+			return this.defaultView;
+		}
+		
+		public void setDefault(String defaultView) {
 			this.defaultView = defaultView;
 		}
 
@@ -140,7 +159,8 @@ public class View {
 		public void setFxml(String fxml) {
 			this.fxml = fxml;
 		}
-
+		
+		@XmlAttribute
 		public String getId() {
 			return id;
 		}
@@ -149,7 +169,7 @@ public class View {
 			this.id = id;
 		}
 
-		public class ContentView {
+		public static class ContentView {
 
 			private String id;
 
