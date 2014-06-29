@@ -35,7 +35,7 @@ import main.java.de.tw.ecm.toolkit.data.RepositoryException;
 import main.java.de.tw.ecm.toolkit.data.reader.CSVDataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
 import main.java.de.tw.ecm.toolkit.data.sources.DataSourceException;
-import main.java.de.tw.ecm.toolkit.data.writer.CSVDataWriter;
+import main.java.de.tw.ecm.toolkit.data.sources.FileDataSource;
 import main.java.de.tw.ecm.toolkit.data.writer.WriterException;
 
 /**
@@ -88,12 +88,14 @@ public class QueryAnalyserController extends AbstractUserController {
 						try {
 							TreeItem<String> selectedItem = (TreeItem<String>) newValue;
 							if (selectedItem.isLeaf()) {
-								String query = selectedRepository.getDataSource()
-										.defaultSelectQuery(
+								String query = selectedRepository
+										.getDataSource().defaultSelectQuery(
 												selectedItem.getValue(), null);
 								queryTextArea.setText(query);
 								toolBar.setDisable(false);
-								selectedEntity = selectedRepository.getEntities().getById(selectedItem.getValue());
+								selectedEntity = selectedRepository
+										.getEntities().getById(
+												selectedItem.getValue());
 							} else
 								toolBar.setDisable(true);
 						} catch (RepositoryException e) {
@@ -106,7 +108,8 @@ public class QueryAnalyserController extends AbstractUserController {
 	public void onPlay(ActionEvent event) {
 		try {
 			String query = queryTextArea.getText();
-			DataList dataList = this.selectedRepository.getDataSource().readList(query);
+			DataList dataList = this.selectedRepository.getDataSource()
+					.readList(query);
 			this.initDataTable(dataList);
 		} catch (DataSourceException e) {
 			this.handleException(e);
@@ -116,10 +119,10 @@ public class QueryAnalyserController extends AbstractUserController {
 	private void initDataTable(DataList data) {
 		// first clear all items
 		this.tableView.getColumns().clear();
-		
+
 		TableColumn column;
 		Attributes attributes = this.selectedEntity.getAttributes();
-		
+
 		for (int i = 0; i < attributes.size(); i++) {
 			final Attribute attribute = attributes.get(i);
 			final int counter = i;
@@ -148,14 +151,15 @@ public class QueryAnalyserController extends AbstractUserController {
 		this.selectedFile = fileChooser.showOpenDialog(this.context
 				.getRootWindow());
 
-		CSVDataReader csvDataReader = new CSVDataReader();
 		try {
-			csvDataReader.open(this.selectedFile);
+			FileDataSource fileDataSource = new FileDataSource(selectedFile);
 			this.selectedFile = this.selectedFile.getParentFile();
 
-			String[] headers = csvDataReader.getHeaders();
-			DataRow row = csvDataReader.readRow();
-		} catch (ReaderException e) {
+			DataList items = fileDataSource.readList();
+			DataList newItems = selectedEntity.newList();
+			newItems.setData(items.getData());
+			this.selectedRepository.getDataSource().create(newItems);
+		} catch (DataSourceException e) {
 			this.handleException(e);
 		}
 	}
@@ -172,28 +176,18 @@ public class QueryAnalyserController extends AbstractUserController {
 		this.selectedFile = fileChooser.showSaveDialog(this.context
 				.getRootWindow());
 
-		CSVDataWriter csvDataWriter = new CSVDataWriter();
 		if (this.selectedFile != null) {
 			try {
-				ObservableList items = this.tableView.getItems();
-				csvDataWriter.open(this.selectedFile);
+				ObservableList<DataRow> items = this.tableView.getItems();
+				FileDataSource fileDataSource = new FileDataSource(selectedFile);
 				this.selectedFile = this.selectedFile.getParentFile();
 
-				String[] captions = this.selectedEntity.getAttributes()
-						.getCaptions();
-				csvDataWriter.writeHeader(captions);
+				DataList list = selectedEntity.newList();
+				list.setData(items);
 
-				for (int i = 0; i < items.size(); i++) {
-					DataRow row = (DataRow) items.get(i);
-					csvDataWriter.writeRow(row);
-				}
-			} catch (WriterException e) {
+				fileDataSource.writeList(list);
+			} catch (DataSourceException e) {
 				this.handleException(e);
-			} finally {
-				try {
-					csvDataWriter.close();
-				} catch (WriterException e) {
-				}
 			}
 		}
 	}

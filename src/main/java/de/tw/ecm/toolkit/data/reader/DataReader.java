@@ -1,6 +1,6 @@
 package main.java.de.tw.ecm.toolkit.data.reader;
 
-import main.java.de.tw.ecm.toolkit.data.DataList;
+import main.java.de.tw.ecm.toolkit.data.DataHeader;
 import main.java.de.tw.ecm.toolkit.data.DataRow;
 
 public interface DataReader {
@@ -12,4 +12,9 @@ public interface DataReader {
 	public DataRow readRow() throws ReaderException;
 
 	public boolean next() throws ReaderException;
+
+	public DataHeader readHeaders() throws ReaderException;
+
+	public String getEntity() throws ReaderException;
+
 }

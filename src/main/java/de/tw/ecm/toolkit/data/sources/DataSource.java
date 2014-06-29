@@ -18,15 +18,17 @@ public interface DataSource {
 
 	public Entities getEntities() throws DataSourceException;
 
-	public void create() throws DataSourceException;
+	public void create(DataList list) throws DataSourceException;
 
 	public DataReader read(String query) throws DataSourceException;
 
 	public DataList readList(String query) throws DataSourceException;
 
-	public void update(Object[] items) throws DataSourceException;
+	public void update(DataList list) throws DataSourceException;
 
-	public void delete(Object[] items) throws DataSourceException;
+	public void delete(DataList list) throws DataSourceException;
+
+	public void delete(String sql) throws DataSourceException;
 
 	public String defaultSelectQuery(String table, String... attributes);
 

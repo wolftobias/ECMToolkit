@@ -52,4 +52,8 @@ public class Entity {
 	public void addAttribute(Attribute attribute) {
 		this.attributes.add(attribute);
 	}
+
+	public DataList newList() {
+		return new DataList(this.id, new DataHeader(this.getAttributes().getNames()));
+	}
 }

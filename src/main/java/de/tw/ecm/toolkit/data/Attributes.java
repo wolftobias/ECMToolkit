@@ -53,6 +53,15 @@ public class Attributes implements Iterable<Attribute> {
 		return captions;
 	}
 
+	public String[] getNames() {
+		String[] names = new String[this.size()];
+		for (int i = 0; i < names.length; i++) {
+			names[i] = this.get(i).getName();
+		}
+
+		return names;
+	}
+
 	@Override
 	public Iterator<Attribute> iterator() {
 		return this.cache.iterator();

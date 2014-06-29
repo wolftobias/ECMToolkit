@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+import main.java.de.tw.ecm.toolkit.data.DataRow;
+
 import org.supercsv.io.AbstractCsvWriter;
 import org.supercsv.prefs.CsvPreference;
 
@@ -49,9 +51,9 @@ public class CSVDataWriter extends AbstractDataWriter {
 	}
 
 	@Override
-	public void writeRow(Object[] items) throws WriterException {
+	public void writeRow(DataRow row) throws WriterException {
 		try {
-			this.csvWriter.write(items);
+			this.csvWriter.write(row.toArray());
 		} catch (IOException e) {
 			throw new WriterException(e);
 		}
@@ -75,7 +77,7 @@ public class CSVDataWriter extends AbstractDataWriter {
 
 	private class CSVWriter extends AbstractCsvWriter {
 		CSVWriter(final Writer writer) {
-			super(writer, CsvPreference.TAB_PREFERENCE);
+			super(writer, CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE);
 		}
 
 		public void write(Object... columns) throws IOException {

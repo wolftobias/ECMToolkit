@@ -1,6 +1,8 @@
 package main.java.de.tw.ecm.toolkit.data.sources;
 
 import main.java.de.tw.ecm.toolkit.data.DataList;
+import main.java.de.tw.ecm.toolkit.data.ECMProperties;
+import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
 
@@ -10,12 +12,24 @@ public abstract class AbstractDataSource implements DataSource {
 
 	Logger log = Logger.getLogger(AbstractDataSource.class);
 
+	protected Repository repository;
+	
+	protected ECMProperties properties;
+
+	@Override
+	public void initialize(Repository repository, ECMProperties properties)
+			throws DataSourceException {
+		this.repository = repository;
+		this.properties = properties;
+	}
+
 	@Override
 	public DataList readList(String query) throws DataSourceException {
+		DataList dataList = null;
 		DataReader reader = this.read(query);
-		DataList dataList = new DataList();
 
 		try {
+			dataList = new DataList(reader.getEntity(), reader.readHeaders());
 			while (reader.next()) {
 				dataList.add(reader.readRow());
 			}
@@ -27,9 +41,7 @@ public abstract class AbstractDataSource implements DataSource {
 
 		return dataList;
 	}
-	
-	
-	
+
 	protected void closeQuietly(DataReader reader) {
 		try {
 			if (reader != null)

@@ -3,9 +3,10 @@ package main.java.de.tw.ecm.toolkit.data.reader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
-import main.java.de.tw.ecm.toolkit.data.DataList;
+import main.java.de.tw.ecm.toolkit.data.DataHeader;
 import main.java.de.tw.ecm.toolkit.data.DataRow;
 
 public class JDBCDataReader extends AbstractDataReader {
@@ -63,4 +64,36 @@ public class JDBCDataReader extends AbstractDataReader {
 			throw new ReaderException(e);
 		}
 	}
+
+	@Override
+	public DataHeader readHeaders() throws ReaderException {
+		DataHeader header = new DataHeader();
+		try {
+			PreparedStatement prepareStatement = this.connection
+					.prepareStatement("SELECT * FROM " + this.getEntity());
+			ResultSet rs = prepareStatement.executeQuery();
+			ResultSetMetaData rsmd = rs.getMetaData();
+
+			int columnCount = rsmd.getColumnCount();
+			for (int i = 1; i <= columnCount; i++) {
+				String columnName = rsmd.getColumnName(i);
+
+				header.add(columnName);
+			}
+		} catch (Exception e) {
+			throw new ReaderException(e);
+		}
+
+		return header;
+	}
+
+	@Override
+	public String getEntity() throws ReaderException {
+		try {
+			return this.rs.getMetaData().getTableName(1);
+		} catch (SQLException e) {
+			throw new ReaderException(e);
+		}
+	}
+
 }

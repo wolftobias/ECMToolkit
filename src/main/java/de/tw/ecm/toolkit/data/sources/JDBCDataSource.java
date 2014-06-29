@@ -11,10 +11,13 @@ import java.sql.SQLException;
 import main.java.de.tw.ecm.toolkit.data.Attribute;
 import main.java.de.tw.ecm.toolkit.data.Attribute.Caption;
 import main.java.de.tw.ecm.toolkit.data.Attributes;
+import main.java.de.tw.ecm.toolkit.data.DataList;
+import main.java.de.tw.ecm.toolkit.data.DataRow;
 import main.java.de.tw.ecm.toolkit.data.ECMProperties;
 import main.java.de.tw.ecm.toolkit.data.Entities;
 import main.java.de.tw.ecm.toolkit.data.Entity;
 import main.java.de.tw.ecm.toolkit.data.Repository;
+import main.java.de.tw.ecm.toolkit.data.RepositoryException;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.JDBCDataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
@@ -82,8 +85,32 @@ public class JDBCDataSource extends AbstractDataSource {
 	}
 
 	@Override
-	public String defaultSelectQuery(String table, String... attributes) {
-		return JdbcDataSourceUtil.createSelectStatement(table, attributes);
+	public String defaultSelectQuery(String table, String... cols) {
+		String queryString = "SELECT ";
+
+		if (cols != null && cols.length > 0) {
+			for (int i = 0; i < cols.length; i++) {
+				queryString += cols[i];
+				queryString += ", ";
+			}
+		} else
+			queryString += "*";
+
+		queryString += " FROM " + table;
+		return queryString.toUpperCase();
+	}
+
+	public String insertQuery(String table, String... cols) {
+		String sql = "INSERT INTO " + table + " VALUES (";
+
+		for (int i = 0; i < cols.length; i++) {
+			sql += "?";
+
+			if (i < cols.length - 1)
+				sql += ", ";
+		}
+
+		return sql + ")";
 	}
 
 	@Override
@@ -161,19 +188,41 @@ public class JDBCDataSource extends AbstractDataSource {
 	}
 
 	@Override
-	public void create() throws DataSourceException {
+	public void create(DataList list) throws DataSourceException {
+		String[] headers = list.getHeaders();
+
+		String sql = this.insertQuery(list.getEntityId(), headers);
+
+		try {
+			PreparedStatement pstmt = this.connection.prepareStatement(sql);
+			for (int i = 0; i < list.size(); i++) {
+				DataRow dataRow = list.get(i);
+				for (int j = 0; j < dataRow.size(); j++) {
+					pstmt.setObject(j + 1, dataRow.get(j));
+				}
+				pstmt.addBatch();
+			}
+			int[] resultCount = pstmt.executeBatch();
+			log.info("Affected row count by the create command: " + resultCount[0]);
+		} catch (SQLException e) {
+			throw new DataSourceException(e);
+		}
+	}
+
+	@Override
+	public void update(DataList list) throws DataSourceException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void update(Object[] items) throws DataSourceException {
+	public void delete(DataList list) throws DataSourceException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void delete(Object[] items) throws DataSourceException {
+	public void delete(String sql) throws DataSourceException {
 		// TODO Auto-generated method stub
 
 	}
