@@ -35,20 +35,20 @@ public class DataHeader {
 	public int size() {
 		return this.names.size();
 	}
-	
+
 	public List<String> getNames() {
 		return this.names;
 	}
-	
+
 	public int getPosition(String column) {
-		int counter = 0;
-		for (String name : names) {
-			if(name.equals(column))
-				return counter++;
+		for (int i = 0; i < names.size(); i++) {
+			String name = names.get(i);
+			if (name.equals(column))
+				return i;
 		}
-		return counter;
+		return -1;
 	}
-	
+
 	public List<String> getCaptions() {
 		List<String> labels = new ArrayList<>();
 		for (Caption caption : this.captions) {
@@ -56,5 +56,5 @@ public class DataHeader {
 		}
 		return labels;
 	}
-	
+
 }

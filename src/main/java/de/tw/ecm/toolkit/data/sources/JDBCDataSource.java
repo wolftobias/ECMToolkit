@@ -138,14 +138,14 @@ public class JDBCDataSource extends AbstractDataSource {
 		return String.format(sql, columns, values);
 	}
 
-	public String deleteQuery(Entity entity, DataList dataList) {
+	public String deleteQuery(Entity entity) {
 		List<String> primaryKeys = entity.getPrimaryKeys();
 		String sql = "DELETE FROM " + entity.getId() + " WHERE ";
 
-		for (int i = 0; i < primaryKeys.size(); i++) {
-			sql += primaryKeys.get(i) + " = ?";
+		for (int j = 0; j < primaryKeys.size(); j++) {
+			sql += primaryKeys.get(j) + " = ?";
 
-			if (i < primaryKeys.size() - 1) {
+			if (j < primaryKeys.size() - 1) {
 				sql += " OR ";
 			}
 		}
@@ -301,7 +301,7 @@ public class JDBCDataSource extends AbstractDataSource {
 	@Override
 	public void delete(Entity entity, DataList dataList)
 			throws DataSourceException {
-		String sql = this.deleteQuery(entity, dataList);
+		String sql = this.deleteQuery(entity);
 		DataHeader header = dataList.getHeader();
 		List<String> primaryKeys = entity.getPrimaryKeys();
 
@@ -312,7 +312,7 @@ public class JDBCDataSource extends AbstractDataSource {
 				DataRow dataRow = dataList.get(i);
 				for (int j = 0; j < primaryKeys.size(); j++) {
 					int position = header.getPosition(primaryKeys.get(j));
-					pstmt.setObject(i + 1, dataRow.get(position));
+					pstmt.setObject(j + 1, dataRow.get(position));
 				}
 				pstmt.addBatch();
 			}

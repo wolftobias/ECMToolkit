@@ -7,6 +7,7 @@ package main.java.de.tw.ecm.toolkit.view.user;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -17,7 +18,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
@@ -34,11 +34,8 @@ import main.java.de.tw.ecm.toolkit.data.DataList;
 import main.java.de.tw.ecm.toolkit.data.DataRow;
 import main.java.de.tw.ecm.toolkit.data.Entity;
 import main.java.de.tw.ecm.toolkit.data.RepositoryException;
-import main.java.de.tw.ecm.toolkit.data.reader.CSVDataReader;
-import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
 import main.java.de.tw.ecm.toolkit.data.sources.DataSourceException;
 import main.java.de.tw.ecm.toolkit.data.sources.FileDataSource;
-import main.java.de.tw.ecm.toolkit.data.writer.WriterException;
 
 /**
  * FXML Controller class
@@ -169,6 +166,7 @@ public class QueryAnalyserController extends AbstractUserController {
 
 			this.selectedRepository.getDataSource().create(this.selectedEntity,
 					newItems);
+			this.tableView.getItems().addAll(newItems.getData());
 		} catch (DataSourceException e) {
 			this.handleException(e);
 		}
@@ -208,11 +206,15 @@ public class QueryAnalyserController extends AbstractUserController {
 	}
 
 	public void onDeleteRow() {
-		ObservableList<DataRow> selectedItems = this.tableView.getSelectionModel().getSelectedItems();
+		List<DataRow> selectedItems = this.tableView.getSelectionModel().getSelectedItems();
 		DataList newItems = selectedEntity.newList();
 		newItems.setData(selectedItems);
 		try {
 			this.selectedRepository.getDataSource().delete(this.selectedEntity, newItems);
+			ObservableList<DataRow> items = this.tableView.getItems();
+			items.removeAll(selectedItems);
+			this.tableView.setItems(items);
+			this.tableView.getSelectionModel().clearSelection();
 		} catch (DataSourceException e) {
 			this.handleException(e);
 		}
