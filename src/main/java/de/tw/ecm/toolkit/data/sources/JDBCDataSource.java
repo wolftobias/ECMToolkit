@@ -7,17 +7,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import main.java.de.tw.ecm.toolkit.data.Attribute;
 import main.java.de.tw.ecm.toolkit.data.Attribute.Caption;
 import main.java.de.tw.ecm.toolkit.data.Attributes;
+import main.java.de.tw.ecm.toolkit.data.DataHeader;
 import main.java.de.tw.ecm.toolkit.data.DataList;
 import main.java.de.tw.ecm.toolkit.data.DataRow;
 import main.java.de.tw.ecm.toolkit.data.ECMProperties;
 import main.java.de.tw.ecm.toolkit.data.Entities;
 import main.java.de.tw.ecm.toolkit.data.Entity;
 import main.java.de.tw.ecm.toolkit.data.Repository;
-import main.java.de.tw.ecm.toolkit.data.RepositoryException;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.JDBCDataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
@@ -31,7 +33,6 @@ public class JDBCDataSource extends AbstractDataSource {
 	public static final String DRIVER = "driver";
 	public static final String URL = "url";
 
-	private Repository repository;
 	private Connection connection;
 	private String driver;
 	private String url;
@@ -43,8 +44,8 @@ public class JDBCDataSource extends AbstractDataSource {
 	@Override
 	public void initialize(Repository repository, ECMProperties properties)
 			throws DataSourceException {
+		super.initialize(repository, properties);
 		try {
-			this.repository = repository;
 			this.driver = properties.getProperty(DRIVER);
 			this.url = properties.getProperty(URL);
 			Class.forName(driver).newInstance();
@@ -74,9 +75,10 @@ public class JDBCDataSource extends AbstractDataSource {
 	}
 
 	@Override
-	public DataReader read(String query) throws DataSourceException {
+	public DataReader read(Entity entity, String query)
+			throws DataSourceException {
 		try {
-			DataReader reader = new JDBCDataReader(this.connection);
+			DataReader reader = new JDBCDataReader(this.connection, entity);
 			reader.open(query);
 			return reader;
 		} catch (ReaderException e) {
@@ -85,12 +87,12 @@ public class JDBCDataSource extends AbstractDataSource {
 	}
 
 	@Override
-	public String defaultSelectQuery(String table, String... cols) {
+	public String defaultSelectQuery(String table, List<String> headers) {
 		String queryString = "SELECT ";
 
-		if (cols != null && cols.length > 0) {
-			for (int i = 0; i < cols.length; i++) {
-				queryString += cols[i];
+		if (headers != null && headers.size() > 0) {
+			for (int i = 0; i < headers.size(); i++) {
+				queryString += headers.get(i);
 				queryString += ", ";
 			}
 		} else
@@ -100,23 +102,62 @@ public class JDBCDataSource extends AbstractDataSource {
 		return queryString.toUpperCase();
 	}
 
-	public String insertQuery(String table, String... cols) {
-		String sql = "INSERT INTO " + table + " VALUES (";
+	public String insertQuery(String table, List<String> headers) {
+		String sql = "INSERT INTO " + table + " (%s) VALUES (%s)";
+		String columns = "";
+		String values = "";
 
-		for (int i = 0; i < cols.length; i++) {
-			sql += "?";
+		for (int i = 0; i < headers.size(); i++) {
+			columns += headers.get(i);
+			values += "?";
 
-			if (i < cols.length - 1)
-				sql += ", ";
+			if (i < headers.size() - 1) {
+				columns += ", ";
+				values += ", ";
+			}
 		}
 
-		return sql + ")";
+		return String.format(sql, columns, values);
+	}
+
+	public String updateQuery(String table, List<String> headers) {
+		String sql = "UPDATE " + table + " SET ";
+		String columns = "";
+		String values = "";
+
+		for (int i = 0; i < headers.size(); i++) {
+			columns += headers.get(i);
+			values += "?";
+
+			if (i < headers.size() - 1) {
+				columns += ", ";
+				values += ", ";
+			}
+		}
+
+		return String.format(sql, columns, values);
+	}
+
+	public String deleteQuery(Entity entity, DataList dataList) {
+		List<String> primaryKeys = entity.getPrimaryKeys();
+		String sql = "DELETE FROM " + entity.getId() + " WHERE ";
+
+		for (int i = 0; i < primaryKeys.size(); i++) {
+			sql += primaryKeys.get(i) + " = ?";
+
+			if (i < primaryKeys.size() - 1) {
+				sql += " OR ";
+			}
+		}
+
+		return sql;
 	}
 
 	@Override
 	public void destroy() throws DataSourceException {
 		try {
-			this.connection.close();
+			if (this.connection != null)
+				this.connection.close();
 		} catch (SQLException e) {
 			throw new DataSourceException(e);
 		}
@@ -138,13 +179,16 @@ public class JDBCDataSource extends AbstractDataSource {
 
 		try {
 			this.entities = new Entities();
-			DatabaseMetaData meta = this.connection.getMetaData();
-			rs = meta.getTables(null, null, null, new String[] { "TABLE" });
+			DatabaseMetaData metaData = this.connection.getMetaData();
+			rs = metaData.getTables(null, null, null, new String[] { "TABLE" });
 
 			while (rs.next()) {
 				tablename = rs.getString("TABLE_NAME");
 				entity = new Entity(tablename);
-				this.readColumnInfo(entity);
+				List<String> primaryKeys = this.readPrimaryKeys(metaData,
+						tablename);
+				entity.setPrimaryKeys(primaryKeys);
+				this.readColumnInfo(entity, primaryKeys);
 				entities.add(entity);
 			}
 
@@ -155,7 +199,8 @@ public class JDBCDataSource extends AbstractDataSource {
 		}
 	}
 
-	private void readColumnInfo(Entity entity) throws SQLException {
+	private void readColumnInfo(Entity entity, List<String> primaryKeys)
+			throws SQLException {
 		Attribute attribute;
 		Attributes attributes = new Attributes();
 		PreparedStatement prepareStatement = this.connection
@@ -178,51 +223,120 @@ public class JDBCDataSource extends AbstractDataSource {
 				int columnDisplaySize = rsmd.getColumnDisplaySize(i);
 				attribute.setSize(columnDisplaySize);
 
+				for (String primaryKey : primaryKeys) {
+					if (attribute.getName().equals(primaryKey))
+						attribute.setPrimaryKey(true);
+				}
+
 				attributes.add(attribute);
 			}
 
 			entity.setAttributes(attributes);
 		} finally {
-			rs.close();
+			closeQuietly(rs);
 		}
 	}
 
-	@Override
-	public void create(DataList list) throws DataSourceException {
-		String[] headers = list.getHeaders();
+	private List<String> readPrimaryKeys(DatabaseMetaData metaData, String table)
+			throws SQLException {
+		ArrayList<String> primaryKeys = new ArrayList<>();
+		ResultSet rs = metaData.getPrimaryKeys(null, null, table);
+		try {
+			while (rs.next()) {
+				String columnName = rs.getString("COLUMN_NAME");
+				primaryKeys.add(columnName);
+			}
+		} finally {
+			closeQuietly(rs);
+		}
+		return primaryKeys;
+	}
 
-		String sql = this.insertQuery(list.getEntityId(), headers);
+	@Override
+	public void create(Entity entity, DataList dataList)
+			throws DataSourceException {
+		List<String> headers = dataList.getHeaderNames();
+		String sql = this.insertQuery(dataList.getEntityId(), headers);
 
 		try {
+			this.connection.setAutoCommit(false);
 			PreparedStatement pstmt = this.connection.prepareStatement(sql);
-			for (int i = 0; i < list.size(); i++) {
-				DataRow dataRow = list.get(i);
+			for (int i = 0; i < dataList.size(); i++) {
+				DataRow dataRow = dataList.get(i);
 				for (int j = 0; j < dataRow.size(); j++) {
 					pstmt.setObject(j + 1, dataRow.get(j));
 				}
 				pstmt.addBatch();
 			}
-			int[] resultCount = pstmt.executeBatch();
-			log.info("Affected row count by the create command: " + resultCount[0]);
+			pstmt.executeBatch();
+			this.connection.commit();
 		} catch (SQLException e) {
 			throw new DataSourceException(e);
 		}
 	}
 
 	@Override
-	public void update(DataList list) throws DataSourceException {
+	public void update(Entity entity, DataList dataList)
+			throws DataSourceException {
+		List<String> headers = dataList.getHeaderNames();
+		String sql = this.updateQuery(dataList.getEntityId(), headers);
+
+		try {
+			this.connection.setAutoCommit(false);
+			PreparedStatement pstmt = this.connection.prepareStatement(sql);
+			for (int i = 0; i < dataList.size(); i++) {
+				DataRow dataRow = dataList.get(i);
+				for (int j = 0; j < dataRow.size(); j++) {
+					pstmt.setObject(j + 1, dataRow.get(j));
+				}
+				pstmt.addBatch();
+			}
+			pstmt.executeBatch();
+			this.connection.commit();
+		} catch (SQLException e) {
+			throw new DataSourceException(e);
+		}
+	}
+
+	@Override
+	public void delete(Entity entity, DataList dataList)
+			throws DataSourceException {
+		String sql = this.deleteQuery(entity, dataList);
+		DataHeader header = dataList.getHeader();
+		List<String> primaryKeys = entity.getPrimaryKeys();
+
+		try {
+			this.connection.setAutoCommit(false);
+			PreparedStatement pstmt = this.connection.prepareStatement(sql);
+			for (int i = 0; i < dataList.size(); i++) {
+				DataRow dataRow = dataList.get(i);
+				for (int j = 0; j < primaryKeys.size(); j++) {
+					int position = header.getPosition(primaryKeys.get(j));
+					pstmt.setObject(i + 1, dataRow.get(position));
+				}
+				pstmt.addBatch();
+			}
+			pstmt.executeBatch();
+			this.connection.commit();
+		} catch (SQLException e) {
+			throw new DataSourceException(e);
+		}
+	}
+
+	@Override
+	public void delete(Entity entity, String sql) throws DataSourceException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void delete(DataList list) throws DataSourceException {
+	public void update(Entity entity, DataRow row) throws DataSourceException {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void delete(String sql) throws DataSourceException {
+	public void delete(Entity entity, DataRow row) throws DataSourceException {
 		// TODO Auto-generated method stub
 
 	}

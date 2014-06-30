@@ -2,9 +2,10 @@ package main.java.de.tw.ecm.toolkit.data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
-public class DataRow {
+public class DataRow implements Iterable<Object> {
 	
 	private List<Object> values = new ArrayList<>();
 
@@ -30,12 +31,17 @@ public class DataRow {
 	public Object get(int i) {
 		return this.values.get(i);
 	}
-	
+
 	public Object[] toArray() {
 		return this.values.toArray();
 	}
 	
 	public List<Object> getValues() {
 		return this.values;
+	}
+
+	@Override
+	public Iterator<Object> iterator() {
+		return this.iterator();
 	}
 }

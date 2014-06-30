@@ -2,6 +2,7 @@ package main.java.de.tw.ecm.toolkit.data.reader;
 
 import main.java.de.tw.ecm.toolkit.data.DataHeader;
 import main.java.de.tw.ecm.toolkit.data.DataRow;
+import main.java.de.tw.ecm.toolkit.data.Entity;
 
 public interface DataReader {
 
@@ -15,6 +16,6 @@ public interface DataReader {
 
 	public DataHeader readHeaders() throws ReaderException;
 
-	public String getEntity() throws ReaderException;
+	public Entity getEntity() throws ReaderException;
 
 }

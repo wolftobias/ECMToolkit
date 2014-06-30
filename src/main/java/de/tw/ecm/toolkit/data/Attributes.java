@@ -7,21 +7,33 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import main.java.de.tw.ecm.toolkit.data.Attribute.Caption;
+
 @XmlType
 public class Attributes implements Iterable<Attribute> {
-	private List<Attribute> cache = new ArrayList<>();
+	
+	private List<Attribute> attributes = new ArrayList<>();
 
 	public Attributes() {
 	}
 
 	public Attributes(List<Attribute> attributes) {
-		this.cache = attributes;
+		this.attributes = attributes;
 	}
 
-	public Attribute getByName(String caption) {
-		for (int i = 0; i < cache.size(); i++) {
-			if (cache.get(i).getName().equals(caption))
-				return cache.get(i);
+	public Attribute getByName(String name) {
+		for (Attribute attribute : attributes) {
+			if (attribute.getName().equals(name))
+				return attribute;
+		}
+
+		return null;
+	}
+
+	public Attribute getByCaption(String caption) {
+		for (Attribute attribute : attributes) {
+			if (attribute.getCaption().equalsIgnoreLocale(caption))
+				return attribute;
 		}
 
 		return null;
@@ -29,41 +41,57 @@ public class Attributes implements Iterable<Attribute> {
 
 	@XmlElement(name = "attribute")
 	public List<Attribute> getAttributes() {
-		return this.cache;
+		return this.attributes;
 	}
 
 	public void add(Attribute attribute) {
-		this.cache.add(attribute);
+		this.attributes.add(attribute);
 	}
 
 	public int size() {
-		return this.cache.size();
+		return this.attributes.size();
 	}
 
 	public Attribute get(int i) {
-		return this.cache.get(i);
+		return this.attributes.get(i);
 	}
 
-	public String[] getCaptions() {
-		String[] captions = new String[this.size()];
-		for (int i = 0; i < captions.length; i++) {
-			captions[i] = this.get(i).getCaption().getText();
+	public List<Caption> getCaptions() {
+		List<Caption> captions = new ArrayList<>();
+		for (Attribute attribute : attributes) {
+			captions.add(attribute.getCaption());
 		}
-
 		return captions;
 	}
 
-	public String[] getNames() {
-		String[] names = new String[this.size()];
-		for (int i = 0; i < names.length; i++) {
-			names[i] = this.get(i).getName();
+	public List<String> getNames() {
+		List<String> names = new ArrayList<>();
+		for (Attribute attribute : attributes) {
+			names.add(attribute.getName());
 		}
-
 		return names;
+	}
+
+	public Caption getCaptionByName(String name) {
+		for (Attribute attribute : attributes) {
+			if(attribute.getName().equalsIgnoreCase(name))
+				return attribute.getCaption();
+		}
+		
+		return null;
+	}
+
+	public String getNameByName(String name) {
+		for (Attribute attribute : attributes) {
+			if(attribute.getName().equalsIgnoreCase(name))
+				return attribute.getName();
+		}
+		
+		return null;
 	}
 
 	@Override
 	public Iterator<Attribute> iterator() {
-		return this.cache.iterator();
+		return this.attributes.iterator();
 	}
 }

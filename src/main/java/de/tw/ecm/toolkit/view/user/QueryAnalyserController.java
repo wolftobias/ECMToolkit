@@ -17,6 +17,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
@@ -109,7 +111,7 @@ public class QueryAnalyserController extends AbstractUserController {
 		try {
 			String query = queryTextArea.getText();
 			DataList dataList = this.selectedRepository.getDataSource()
-					.readList(query);
+					.readList(this.selectedEntity, query);
 			this.initDataTable(dataList);
 		} catch (DataSourceException e) {
 			this.handleException(e);
@@ -119,6 +121,7 @@ public class QueryAnalyserController extends AbstractUserController {
 	private void initDataTable(DataList data) {
 		// first clear all items
 		this.tableView.getColumns().clear();
+		this.tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
 		TableColumn column;
 		Attributes attributes = this.selectedEntity.getAttributes();
@@ -131,7 +134,11 @@ public class QueryAnalyserController extends AbstractUserController {
 				public ObservableValue<String> call(
 						CellDataFeatures<ObservableList, String> param) {
 					DataRow row = (DataRow) param.getValue();
-					return new SimpleStringProperty(row.get(counter).toString());
+					Object object = row.get(counter);
+					if (object != null)
+						return new SimpleStringProperty(object.toString());
+					else
+						return new SimpleStringProperty("");
 				}
 			});
 
@@ -152,13 +159,16 @@ public class QueryAnalyserController extends AbstractUserController {
 				.getRootWindow());
 
 		try {
-			FileDataSource fileDataSource = new FileDataSource(selectedFile);
+			FileDataSource fileDataSource = new FileDataSource(selectedFile,
+					this.selectedEntity);
 			this.selectedFile = this.selectedFile.getParentFile();
 
 			DataList items = fileDataSource.readList();
 			DataList newItems = selectedEntity.newList();
 			newItems.setData(items.getData());
-			this.selectedRepository.getDataSource().create(newItems);
+
+			this.selectedRepository.getDataSource().create(this.selectedEntity,
+					newItems);
 		} catch (DataSourceException e) {
 			this.handleException(e);
 		}
@@ -179,7 +189,8 @@ public class QueryAnalyserController extends AbstractUserController {
 		if (this.selectedFile != null) {
 			try {
 				ObservableList<DataRow> items = this.tableView.getItems();
-				FileDataSource fileDataSource = new FileDataSource(selectedFile);
+				FileDataSource fileDataSource = new FileDataSource(
+						selectedFile, this.selectedEntity);
 				this.selectedFile = this.selectedFile.getParentFile();
 
 				DataList list = selectedEntity.newList();
@@ -194,5 +205,16 @@ public class QueryAnalyserController extends AbstractUserController {
 
 	public void onQueryChoice(ActionEvent event) {
 
+	}
+
+	public void onDeleteRow() {
+		ObservableList<DataRow> selectedItems = this.tableView.getSelectionModel().getSelectedItems();
+		DataList newItems = selectedEntity.newList();
+		newItems.setData(selectedItems);
+		try {
+			this.selectedRepository.getDataSource().delete(this.selectedEntity, newItems);
+		} catch (DataSourceException e) {
+			this.handleException(e);
+		}
 	}
 }

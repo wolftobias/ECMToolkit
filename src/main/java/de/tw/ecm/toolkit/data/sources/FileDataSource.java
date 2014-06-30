@@ -1,9 +1,12 @@
 package main.java.de.tw.ecm.toolkit.data.sources;
 
 import java.io.File;
+import java.util.List;
 
+import main.java.de.tw.ecm.toolkit.data.Attribute.Caption;
 import main.java.de.tw.ecm.toolkit.data.DataList;
 import main.java.de.tw.ecm.toolkit.data.DataRow;
+import main.java.de.tw.ecm.toolkit.data.Entity;
 import main.java.de.tw.ecm.toolkit.data.reader.CSVDataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
@@ -19,8 +22,11 @@ public class FileDataSource {
 
 	protected File file;
 
-	public FileDataSource(File file) {
+	protected Entity entity;
+	
+	public FileDataSource(File file, Entity entity) {
 		this.file = file;
+		this.entity = entity;
 	}
 
 	public DataList readList() throws DataSourceException {
@@ -28,8 +34,8 @@ public class FileDataSource {
 		DataReader reader = null;
 
 		try {
-			reader = new CSVDataReader(file);
-			dataList = new DataList(reader.getEntity(), reader.readHeaders());
+			reader = new CSVDataReader(file, this.entity);
+			dataList = new DataList(this.entity);
 			while (reader.next()) {
 				dataList.add(reader.readRow());
 			}
@@ -45,8 +51,13 @@ public class FileDataSource {
 	public void writeList(DataList list) throws DataSourceException {
 		CSVDataWriter writer = null;
 		try {
+			List<String> headers = list.getHeaderCaptions();
+			
+			if(headers.isEmpty())
+				headers = list.getHeaderNames();
+			
 			writer = new CSVDataWriter(file);
-			writer.writeHeader(list.getHeaders());
+			writer.writeHeader(headers);
 
 			for (int i = 0; i < list.size(); i++) {
 				DataRow dataRow = list.get(i);

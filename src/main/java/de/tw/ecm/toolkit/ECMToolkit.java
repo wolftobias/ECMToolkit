@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import main.java.de.tw.ecm.toolkit.data.sources.DataSourceException;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -24,15 +25,30 @@ import org.apache.commons.cli.ParseException;
  */
 public class ECMToolkit extends Application {
 
+	Logger log = Logger.getLogger(ECMToolkit.class.getName());
+
 	private Context context;
-	
+
 	private Stage primaryStage;
-	
+
 	@Override
 	public void init() throws Exception {
 		super.init();
+		// add shutdown hook to close all open datasource resources
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				try {
+					log.severe("JVM was terminated unexpected!");
+					Context.context().getSelectedRepository().getDataSource()
+							.destroy();
+				} catch (DataSourceException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
 	}
-	
+
 	@Override
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
@@ -62,12 +78,12 @@ public class ECMToolkit extends Application {
 				(String[]) rawList.toArray(new String[rawList.size()]));
 		this.context.put(commandLine);
 	}
-	
+
 	@Override
 	public void stop() throws Exception {
 		this.context.getSelectedRepository().getDataSource().destroy();
 	}
-	
+
 	public Stage getPrimaryStage() {
 		return primaryStage;
 	}

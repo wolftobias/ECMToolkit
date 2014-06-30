@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 import main.java.de.tw.ecm.toolkit.data.DataHeader;
 import main.java.de.tw.ecm.toolkit.data.DataRow;
+import main.java.de.tw.ecm.toolkit.data.Entity;
 
 public class JDBCDataReader extends AbstractDataReader {
 
@@ -15,8 +16,9 @@ public class JDBCDataReader extends AbstractDataReader {
 
 	private ResultSet rs;
 
-	public JDBCDataReader(Connection connection) {
+	public JDBCDataReader(Connection connection, Entity entity) {
 		this.connection = connection;
+		this.entity = entity;
 	}
 
 	@Override
@@ -70,7 +72,7 @@ public class JDBCDataReader extends AbstractDataReader {
 		DataHeader header = new DataHeader();
 		try {
 			PreparedStatement prepareStatement = this.connection
-					.prepareStatement("SELECT * FROM " + this.getEntity());
+					.prepareStatement("SELECT * FROM " + this.getEntity().getId());
 			ResultSet rs = prepareStatement.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
 
@@ -78,7 +80,7 @@ public class JDBCDataReader extends AbstractDataReader {
 			for (int i = 1; i <= columnCount; i++) {
 				String columnName = rsmd.getColumnName(i);
 
-				header.add(columnName);
+				header.add(columnName, this.entity.getAttributes().getCaptionByName(columnName));
 			}
 		} catch (Exception e) {
 			throw new ReaderException(e);
@@ -88,12 +90,7 @@ public class JDBCDataReader extends AbstractDataReader {
 	}
 
 	@Override
-	public String getEntity() throws ReaderException {
-		try {
-			return this.rs.getMetaData().getTableName(1);
-		} catch (SQLException e) {
-			throw new ReaderException(e);
-		}
+	public Entity getEntity() throws ReaderException {
+		return this.entity;
 	}
-
 }

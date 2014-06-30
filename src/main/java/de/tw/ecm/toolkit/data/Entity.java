@@ -1,7 +1,11 @@
 package main.java.de.tw.ecm.toolkit.data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 import main.java.de.tw.ecm.toolkit.data.Attribute.Caption;
@@ -14,7 +18,9 @@ public class Entity {
 	private String id;
 
 	private Attributes attributes = new Attributes();
-
+	
+	private List<String> primaryKeys = new ArrayList<>();
+	
 	public Entity() {
 	}
 
@@ -54,6 +60,17 @@ public class Entity {
 	}
 
 	public DataList newList() {
-		return new DataList(this.id, new DataHeader(this.getAttributes().getNames()));
+		return new DataList(this, new DataHeader(this.getAttributes().getNames(), this.getAttributes().getCaptions()));
 	}
+	
+	@XmlTransient
+	public List<String> getPrimaryKeys() {
+		return primaryKeys;
+	}
+
+	public void setPrimaryKeys(List<String> primaryKeys) {
+		this.primaryKeys = primaryKeys;
+	}
+	
+	
 }

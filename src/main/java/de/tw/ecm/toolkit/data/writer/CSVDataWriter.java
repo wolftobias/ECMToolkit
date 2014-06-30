@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 
 import main.java.de.tw.ecm.toolkit.data.DataRow;
 
@@ -59,9 +60,9 @@ public class CSVDataWriter extends AbstractDataWriter {
 		}
 	}
 
-	public void writeHeader(String[] headers) throws WriterException {
+	public void writeHeader(List<String> headers) throws WriterException {
 		try {
-			this.csvWriter.writeHeader(headers);
+			this.csvWriter.writeHeader((String[])headers.toArray(new String[headers.size()]));
 		} catch (IOException e) {
 			throw new WriterException(e);
 		}

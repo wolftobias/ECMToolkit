@@ -7,6 +7,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="libs/super-csv-2.2.0.jar" sourcepath="C:/Download/super-csv-distribution-2.2.0-bin/super-csv/super-csv-2.2.0-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
-	<classpathentry kind="lib" path="libs/commons-lang3-3.3.2.jar"/>
+	<classpathentry kind="lib" path="libs/commons-lang3-3.3.2.jar" sourcepath="C:/download/commons-lang3-3.3.2-bin/commons-lang3-3.3.2-src/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

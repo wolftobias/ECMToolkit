@@ -21,6 +21,8 @@ public class Attribute {
 
 	private String nativeType;
 
+	private boolean primaryKey = false;
+
 	public Attribute() {
 	}
 
@@ -77,6 +79,15 @@ public class Attribute {
 		this.nativeType = nativeType;
 	}
 
+	@XmlTransient
+	public boolean isPrimaryKey() {
+		return primaryKey;
+	}
+
+	public void setPrimaryKey(boolean primaryKey) {
+		this.primaryKey = primaryKey;
+	}
+
 	@XmlType(propOrder = { "text", "localeStr" })
 	public static class Caption {
 
@@ -131,13 +142,18 @@ public class Attribute {
 		}
 
 		public boolean equalsIgnoreLocale(Object obj) {
-			if(obj instanceof Caption) {
-				Caption caption = (Caption)obj;
-				if(this.text.equals(caption.getText()))
+			if (obj instanceof Caption) {
+				Caption caption = (Caption) obj;
+				if (this.text.equals(caption.getText()))
 					return true;
 				else
 					return false;
-			}else
+			} else if (obj instanceof String) {
+				if (this.text.equals((String) obj))
+					return true;
+				else
+					return false;
+			} else
 				return super.equals(obj);
 		}
 	}
