@@ -39,7 +39,7 @@ public class ECMToolkit extends Application {
 			@Override
 			public void run() {
 				try {
-					log.severe("JVM was terminated unexpected!");
+					log.info("JVM was terminated!");
 					Context.context().getSelectedRepository().getDataSource()
 							.destroy();
 				} catch (DataSourceException e) {

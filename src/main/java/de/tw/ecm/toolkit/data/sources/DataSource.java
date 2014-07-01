@@ -3,7 +3,6 @@ package main.java.de.tw.ecm.toolkit.data.sources;
 import java.util.List;
 
 import main.java.de.tw.ecm.toolkit.data.DataList;
-import main.java.de.tw.ecm.toolkit.data.DataRow;
 import main.java.de.tw.ecm.toolkit.data.ECMProperties;
 import main.java.de.tw.ecm.toolkit.data.Entities;
 import main.java.de.tw.ecm.toolkit.data.Entity;
@@ -32,13 +31,9 @@ public interface DataSource {
 
 	public void update(Entity entity, DataList list) throws DataSourceException;
 
-	public void update(Entity entity, DataRow row) throws DataSourceException;
-
 	public void delete(Entity entity, DataList list) throws DataSourceException;
 
 	public void delete(Entity entity, String sql) throws DataSourceException;
-
-	public void delete(Entity entity, DataRow row) throws DataSourceException;
 
 	public String defaultSelectQuery(String table, List<String> headers);
 

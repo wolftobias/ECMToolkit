@@ -19,6 +19,7 @@ import main.java.de.tw.ecm.toolkit.data.DataRow;
 import main.java.de.tw.ecm.toolkit.data.ECMProperties;
 import main.java.de.tw.ecm.toolkit.data.Entities;
 import main.java.de.tw.ecm.toolkit.data.Entity;
+import main.java.de.tw.ecm.toolkit.data.PrimaryKeys;
 import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.JDBCDataReader;
@@ -102,7 +103,7 @@ public class JDBCDataSource extends AbstractDataSource {
 		return queryString.toUpperCase();
 	}
 
-	public String insertQuery(String table, List<String> headers) {
+	private String insertQuery(String table, List<String> headers) {
 		String sql = "INSERT INTO " + table + " (%s) VALUES (%s)";
 		String columns = "";
 		String values = "";
@@ -120,33 +121,46 @@ public class JDBCDataSource extends AbstractDataSource {
 		return String.format(sql, columns, values);
 	}
 
-	public String updateQuery(String table, List<String> headers) {
-		String sql = "UPDATE " + table + " SET ";
+	private String updateQuery(Entity entity, List<String> headers) {
+		PrimaryKeys primaryKeys = entity.getPrimaryKeys();
+		String sql = "UPDATE " + entity.getId() + " SET ";
 		String columns = "";
-		String values = "";
 
 		for (int i = 0; i < headers.size(); i++) {
-			columns += headers.get(i);
-			values += "?";
-
-			if (i < headers.size() - 1) {
-				columns += ", ";
-				values += ", ";
+			String header = headers.get(i);
+			
+			if(!primaryKeys.contains(header)) {
+				columns += header + " = ?";
+	
+				if (i < headers.size() - 1) {
+					columns += ", ";
+				}
 			}
 		}
+		
+		sql += columns;
+		sql += " WHERE ";
+		
+		for (int j = 0; j < primaryKeys.size(); j++) {
+			sql += primaryKeys.get(j) + " = ?";
 
-		return String.format(sql, columns, values);
+			if (j < primaryKeys.size() - 1) {
+				sql += " AND ";
+			}
+		}
+		
+		return sql;
 	}
 
-	public String deleteQuery(Entity entity) {
-		List<String> primaryKeys = entity.getPrimaryKeys();
+	private String deleteQuery(Entity entity) {
+		PrimaryKeys primaryKeys = entity.getPrimaryKeys();
 		String sql = "DELETE FROM " + entity.getId() + " WHERE ";
 
 		for (int j = 0; j < primaryKeys.size(); j++) {
 			sql += primaryKeys.get(j) + " = ?";
 
 			if (j < primaryKeys.size() - 1) {
-				sql += " OR ";
+				sql += " AND ";
 			}
 		}
 
@@ -185,7 +199,7 @@ public class JDBCDataSource extends AbstractDataSource {
 			while (rs.next()) {
 				tablename = rs.getString("TABLE_NAME");
 				entity = new Entity(tablename);
-				List<String> primaryKeys = this.readPrimaryKeys(metaData,
+				PrimaryKeys primaryKeys = this.readPrimaryKeys(metaData,
 						tablename);
 				entity.setPrimaryKeys(primaryKeys);
 				this.readColumnInfo(entity, primaryKeys);
@@ -199,7 +213,7 @@ public class JDBCDataSource extends AbstractDataSource {
 		}
 	}
 
-	private void readColumnInfo(Entity entity, List<String> primaryKeys)
+	private void readColumnInfo(Entity entity, PrimaryKeys primaryKeys)
 			throws SQLException {
 		Attribute attribute;
 		Attributes attributes = new Attributes();
@@ -237,9 +251,9 @@ public class JDBCDataSource extends AbstractDataSource {
 		}
 	}
 
-	private List<String> readPrimaryKeys(DatabaseMetaData metaData, String table)
+	private PrimaryKeys readPrimaryKeys(DatabaseMetaData metaData, String table)
 			throws SQLException {
-		ArrayList<String> primaryKeys = new ArrayList<>();
+		PrimaryKeys primaryKeys = new PrimaryKeys();
 		ResultSet rs = metaData.getPrimaryKeys(null, null, table);
 		try {
 			while (rs.next()) {
@@ -256,7 +270,7 @@ public class JDBCDataSource extends AbstractDataSource {
 	public void create(Entity entity, DataList dataList)
 			throws DataSourceException {
 		List<String> headers = dataList.getHeaderNames();
-		String sql = this.insertQuery(dataList.getEntityId(), headers);
+		String sql = this.insertQuery(dataList.getEntity().getId(), headers);
 
 		try {
 			this.connection.setAutoCommit(false);
@@ -270,6 +284,7 @@ public class JDBCDataSource extends AbstractDataSource {
 			}
 			pstmt.executeBatch();
 			this.connection.commit();
+			this.connection.setAutoCommit(true);
 		} catch (SQLException e) {
 			throw new DataSourceException(e);
 		}
@@ -279,20 +294,31 @@ public class JDBCDataSource extends AbstractDataSource {
 	public void update(Entity entity, DataList dataList)
 			throws DataSourceException {
 		List<String> headers = dataList.getHeaderNames();
-		String sql = this.updateQuery(dataList.getEntityId(), headers);
+		PrimaryKeys primaryKeys = entity.getPrimaryKeys();
+		String sql = this.updateQuery(dataList.getEntity(), headers);
 
 		try {
 			this.connection.setAutoCommit(false);
 			PreparedStatement pstmt = this.connection.prepareStatement(sql);
 			for (int i = 0; i < dataList.size(); i++) {
 				DataRow dataRow = dataList.get(i);
+				int parameterIndex = 1;
 				for (int j = 0; j < dataRow.size(); j++) {
-					pstmt.setObject(j + 1, dataRow.get(j));
+					int primaryKeyPos = dataList.primaryKeyPos();
+					if(j != primaryKeyPos)
+						pstmt.setObject(parameterIndex++, dataRow.get(j));
 				}
+				
+				for (int j = 0; j < primaryKeys.size(); j++) {
+					int position = dataList.getHeader().getPosition(primaryKeys.get(j));
+					Object object = dataRow.get(position);
+					pstmt.setObject(parameterIndex++, object);
+				}				
 				pstmt.addBatch();
 			}
 			pstmt.executeBatch();
 			this.connection.commit();
+			this.connection.setAutoCommit(true);
 		} catch (SQLException e) {
 			throw new DataSourceException(e);
 		}
@@ -303,7 +329,7 @@ public class JDBCDataSource extends AbstractDataSource {
 			throws DataSourceException {
 		String sql = this.deleteQuery(entity);
 		DataHeader header = dataList.getHeader();
-		List<String> primaryKeys = entity.getPrimaryKeys();
+		PrimaryKeys primaryKeys = entity.getPrimaryKeys();
 
 		try {
 			this.connection.setAutoCommit(false);
@@ -318,6 +344,7 @@ public class JDBCDataSource extends AbstractDataSource {
 			}
 			pstmt.executeBatch();
 			this.connection.commit();
+			this.connection.setAutoCommit(true);
 		} catch (SQLException e) {
 			throw new DataSourceException(e);
 		}
@@ -325,18 +352,6 @@ public class JDBCDataSource extends AbstractDataSource {
 
 	@Override
 	public void delete(Entity entity, String sql) throws DataSourceException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void update(Entity entity, DataRow row) throws DataSourceException {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void delete(Entity entity, DataRow row) throws DataSourceException {
 		// TODO Auto-generated method stub
 
 	}

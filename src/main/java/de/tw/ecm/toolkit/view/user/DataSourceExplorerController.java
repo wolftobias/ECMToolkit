@@ -43,8 +43,7 @@ public class DataSourceExplorerController extends AbstractUserController {
 					this.selectedRepository.getCaption());
 			rootItem.setExpanded(true);
 			for (int i = 0; i < entities.size(); i++) {
-				TreeItem<String> item = new TreeItem<String>(entities.get(i)
-						.getId());
+				TreeItem<String> item = new TreeItem<String>(entities.get(i).getId());
 				rootItem.getChildren().add(item);
 			}
 

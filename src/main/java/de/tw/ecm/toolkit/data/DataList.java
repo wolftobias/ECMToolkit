@@ -1,31 +1,15 @@
 package main.java.de.tw.ecm.toolkit.data;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import main.java.de.tw.ecm.toolkit.data.Attribute.Caption;
-
-public class DataList implements Iterable<DataRow> {
+public class DataList extends Values<DataRow> {
 
 	private Entity entity;
 
-	private String entityId;
-
 	private DataHeader header;
-
-	private List<DataRow> data = new ArrayList<>();
-
-	public DataList(String entityId, DataHeader header) {
-		this.entityId = entityId;
-		this.header = header;
-	}
 
 	public DataList(Entity entity, DataHeader header) {
 		this.entity = entity;
-		this.entityId = entity.getId();
 		this.header = header;
 	}
 
@@ -33,24 +17,22 @@ public class DataList implements Iterable<DataRow> {
 		this.entity = entity;
 	}
 
-	public void add(DataRow row) {
-		this.data.add(row);
+	public DataRow addNew(DataRow row) {
+		try {
+			DataRow newRow = (DataRow)row.clone();
+			this.add(newRow);
+			return newRow;
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
-	public int size() {
-		return this.data.size();
+	public Entity getEntity() {
+		return entity;
 	}
 
-	public DataRow get(int i) {
-		return this.data.get(i);
-	}
-
-	public String getEntityId() {
-		return entityId;
-	}
-
-	public void setEntityId(String entityId) {
-		this.entityId = entityId;
+	public void setEntity(Entity entity) {
+		this.entity = entity;
 	}
 
 	public DataHeader getHeader() {
@@ -68,30 +50,27 @@ public class DataList implements Iterable<DataRow> {
 	public List<String> getHeaderCaptions() {
 		return this.header.getCaptions();
 	}
-
-	public List<DataRow> getData() {
-		return data;
+	
+	public boolean replaceRowValue(String header, Object newValue) {
+		int position = this.header.getPosition(header);
+		for (int i = 0; i < this.values.size(); i++) {
+			DataRow dataRow = this.values.get(i);
+			dataRow.set(position, newValue);
+			return true;
+		}
+		return false;
 	}
-
-	public void setData(List<DataRow> data) {
-		// if (this.entity != null) {
-		// this.data.clear();
-		//
-		// for (int i = 0; i < data.size(); i++) {
-		// DataRow oldRow = data.get(i);
-		// DataRow newRow = this.convertToJavaTypes(oldRow);
-		// this.data.add(newRow);
-		// }
-		// } else
-		this.data = data;
-	}
-
-	public ObservableList<DataRow> toObservableList() {
-		return FXCollections.observableList(this.data);
-	}
-
-	@Override
-	public Iterator<DataRow> iterator() {
-		return this.data.iterator();
+	
+	public int primaryKeyPos() {
+		List<String> names = this.header.getNames();
+		for (int i = 0; i < names.size(); i++) {
+			PrimaryKeys primaryKeys = this.entity.getPrimaryKeys();
+			for (int j = 0; j < primaryKeys.size(); j++) {
+				if(names.get(i).equals(primaryKeys.get(j)))
+					return i;
+			}
+		}
+		
+		return -1;
 	}
 }

@@ -157,4 +157,19 @@ public class Attribute {
 				return super.equals(obj);
 		}
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return this.name.equals(obj);
+	}
+	
+	@Override
+	public String toString() {
+		return name.toString() + this.caption;
+	}
+	
+	@Override
+	public int hashCode() {
+		return name.hashCode();
+	}	
 }

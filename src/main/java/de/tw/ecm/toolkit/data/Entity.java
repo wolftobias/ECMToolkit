@@ -18,8 +18,8 @@ public class Entity {
 	private String id;
 
 	private Attributes attributes = new Attributes();
-	
-	private List<String> primaryKeys = new ArrayList<>();
+
+	private PrimaryKeys primaryKeys = new PrimaryKeys(); 
 	
 	public Entity() {
 	}
@@ -60,17 +60,31 @@ public class Entity {
 	}
 
 	public DataList newList() {
-		return new DataList(this, new DataHeader(this.getAttributes().getNames(), this.getAttributes().getCaptions()));
+		return new DataList(this, new DataHeader(this.getAttributes()
+				.getNames(), this.getAttributes().getCaptions()));
 	}
-	
+
 	@XmlTransient
-	public List<String> getPrimaryKeys() {
+	public PrimaryKeys getPrimaryKeys() {
 		return primaryKeys;
 	}
 
-	public void setPrimaryKeys(List<String> primaryKeys) {
+	public void setPrimaryKeys(PrimaryKeys primaryKeys) {
 		this.primaryKeys = primaryKeys;
 	}
-	
-	
+
+	@Override
+	public boolean equals(Object obj) {
+		return this.id.equals(obj);
+	}
+
+	@Override
+	public String toString() {
+		return id.toString() + this.caption;
+	}
+
+	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
 }

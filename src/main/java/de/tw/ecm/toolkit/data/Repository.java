@@ -151,4 +151,19 @@ public class Repository implements Builder<Repository> {
 
 		return this;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return this.id.equals(obj);
+	}
+
+	@Override
+	public String toString() {
+		return id.toString() + this.caption;
+	}
+
+	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}	
 }
