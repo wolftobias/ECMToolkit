@@ -2,7 +2,6 @@ package main.java.de.tw.ecm.toolkit.data;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.JAXB;
@@ -14,10 +13,8 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.apache.commons.lang3.builder.Builder;
 
 @XmlRootElement(name = "repositories")
-public class Repositories implements Builder<Repositories>,
+public class Repositories extends Values<Repository> implements Builder<Repositories>,
 		Iterable<Repository> {
-
-	private ArrayList<Repository> cache = new ArrayList<>();
 
 	private String defaultRepo;
 
@@ -26,12 +23,12 @@ public class Repositories implements Builder<Repositories>,
 	public Repositories() {
 	}
 
-	public Repositories(ArrayList<Repository> repositories) {
-		this.cache = repositories;
+	public Repositories(List<Repository> repositories) {
+		this.values = repositories;
 	}
 
 	public Repository getByCaption(String caption) {
-		for (Repository repository : this.cache) {
+		for (Repository repository : this.values) {
 			if (repository.getCaption().equals(caption))
 				return repository;
 		}
@@ -40,7 +37,7 @@ public class Repositories implements Builder<Repositories>,
 	}
 
 	public Repository getById(String id) {
-		for (Repository repository : this.cache) {
+		for (Repository repository : this.values) {
 			if (repository.getId().equalsIgnoreCase(id))
 				return repository;
 		}
@@ -50,19 +47,7 @@ public class Repositories implements Builder<Repositories>,
 
 	@XmlElement(name = "repository")
 	public List<Repository> getRepositories() {
-		return this.cache;
-	}
-
-	public void add(Repository repository) {
-		this.cache.add(repository);
-	}
-
-	public int size() {
-		return this.cache.size();
-	}
-
-	public Repository get(int i) {
-		return this.cache.get(i);
+		return this.values;
 	}
 
 	public Repository getDefaultRepository() {
@@ -84,7 +69,7 @@ public class Repositories implements Builder<Repositories>,
 
 	public List<String> getRepositoryIds() {
 		List<String> ids = new ArrayList<>();
-		for (Repository repository : this.cache) {
+		for (Repository repository : this.values) {
 			ids.add(repository.getId());
 		}
 
@@ -93,7 +78,7 @@ public class Repositories implements Builder<Repositories>,
 
 	public List<String> getRepositoryCaptions() {
 		List<String> captions = new ArrayList<>();
-		for (Repository repository : this.cache) {
+		for (Repository repository : this.values) {
 			captions.add(repository.getCaption());
 		}
 
@@ -113,11 +98,6 @@ public class Repositories implements Builder<Repositories>,
 		String xml = "";
 		JAXB.marshal(this, xml);
 		return xml;
-	}
-
-	@Override
-	public Iterator<Repository> iterator() {
-		return this.cache.iterator();
 	}
 
 	@Override

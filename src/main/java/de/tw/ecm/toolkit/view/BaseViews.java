@@ -2,9 +2,11 @@ package main.java.de.tw.ecm.toolkit.view;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import main.java.de.tw.ecm.toolkit.data.Values;
+
 import org.apache.commons.lang3.builder.Builder;
 
-public class BaseView implements Builder<BaseView> {
+public class BaseViews<T> extends Values<T> implements Builder<BaseViews> {
 
 	protected String id;
 
@@ -18,7 +20,7 @@ public class BaseView implements Builder<BaseView> {
 
 	protected String fxml;
 
-	public BaseView() {
+	public BaseViews() {
 	}
 
 	@XmlTransient
@@ -76,7 +78,7 @@ public class BaseView implements Builder<BaseView> {
 	}
 
 	@Override
-	public BaseView build() {
+	public BaseViews build() {
 		try {
 			this.controllerClass = Class.forName(this.controller);
 		} catch (ClassNotFoundException e) {

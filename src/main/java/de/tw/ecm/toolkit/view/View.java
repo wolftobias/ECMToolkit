@@ -1,42 +1,25 @@
 package main.java.de.tw.ecm.toolkit.view;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-import org.apache.commons.lang3.builder.Builder;
-
 @XmlType(propOrder = { "id", "user", "group", "default", "views" })
-public class View implements Builder<View>, Iterable<NavigationView> {
-
-	private String id;
+public class View extends BaseViews<NavigationView> {
 
 	private String user;
 
 	private String group;
 
-	private ArrayList<NavigationView> cache = new ArrayList<>();
-
 	private String defaultView;
 
 	public View() {
-	}
-
-	public void add(NavigationView view) {
-		this.cache.add(view);
-	}
-
-	public int size() {
-		return this.cache.size();
-	}
-
-	public NavigationView get(int i) {
-		return this.cache.get(i);
 	}
 
 	public NavigationView getDefaultNavigationView() {
@@ -44,7 +27,7 @@ public class View implements Builder<View>, Iterable<NavigationView> {
 	}
 
 	public NavigationView getById(String id) {
-		for (NavigationView view : this.cache) {
+		for (NavigationView view : this.values) {
 			if (view.getId().equals(id))
 				return view;
 		}
@@ -55,16 +38,7 @@ public class View implements Builder<View>, Iterable<NavigationView> {
 	@XmlElementWrapper(name = "navigationviews")
 	@XmlElement(name = "navigationview")
 	public List<NavigationView> getViews() {
-		return this.cache;
-	}
-
-	@XmlAttribute
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
+		return this.values;
 	}
 
 	@XmlAttribute
@@ -85,23 +59,31 @@ public class View implements Builder<View>, Iterable<NavigationView> {
 		this.group = group;
 	}
 
+	@Override
 	@XmlAttribute
-	public String getDefault() {
-		return defaultView;
-	}
-
-	public void setDefault(String defaultView) {
-		this.defaultView = defaultView;
+	public String getId() {
+		return super.getId();
 	}
 
 	@Override
-	public Iterator<NavigationView> iterator() {
-		return this.cache.iterator();
+	public void setId(String id) {
+		super.setId(id);
+	}
+
+	@Override
+	@XmlAttribute
+	public String getDefault() {
+		return super.getDefault();
+	}
+
+	@Override
+	public void setDefault(String defaultView) {
+		super.setDefault(defaultView);
 	}
 
 	@Override
 	public View build() {
-		for (NavigationView navigationView : this.cache) {
+		for (NavigationView navigationView : this.values) {
 			navigationView.build();
 		}
 

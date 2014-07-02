@@ -2,6 +2,8 @@ package main.java.de.tw.ecm.toolkit.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
@@ -10,7 +12,7 @@ import main.java.de.tw.ecm.toolkit.data.Attribute.Caption;
 
 @XmlType
 public class Attributes extends Values<Attribute> {
-	
+
 	public Attributes() {
 	}
 
@@ -59,19 +61,19 @@ public class Attributes extends Values<Attribute> {
 
 	public Caption getCaptionByName(String name) {
 		for (Attribute attribute : values) {
-			if(attribute.getName().equalsIgnoreCase(name))
+			if (attribute.getName().equalsIgnoreCase(name))
 				return attribute.getCaption();
 		}
-		
+
 		return null;
 	}
 
 	public String getNameByName(String name) {
 		for (Attribute attribute : values) {
-			if(attribute.getName().equalsIgnoreCase(name))
+			if (attribute.getName().equalsIgnoreCase(name))
 				return attribute.getName();
 		}
-		
+
 		return null;
 	}
 }

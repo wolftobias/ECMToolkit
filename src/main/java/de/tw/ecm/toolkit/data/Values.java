@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import javax.xml.bind.annotation.XmlTransient;
 
 public abstract class Values<T> implements Iterable<T>, Cloneable {
 
@@ -84,5 +88,15 @@ public abstract class Values<T> implements Iterable<T>, Cloneable {
 	
 	public boolean contains(Object object) {
 		return this.values.contains(object);
+	}
+	
+	@Override
+	public void forEach(Consumer<? super T> action) {
+		this.values.forEach(action);
+	}
+	
+	@Override
+	public Spliterator<T> spliterator() {
+		return this.values.spliterator();
 	}
 }
