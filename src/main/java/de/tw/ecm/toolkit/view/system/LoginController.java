@@ -31,7 +31,7 @@ public class LoginController extends AbstractController {
 	@FXML
 	Label lblErrorMessage;
 	@FXML
-	ComboBox cmbRepository;
+	ComboBox<String> cmbRepository;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
