@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -15,6 +16,7 @@ import javafx.scene.control.TextField;
 import main.java.de.tw.ecm.toolkit.data.Repositories;
 import main.java.de.tw.ecm.toolkit.data.RepositoryException;
 import main.java.de.tw.ecm.toolkit.data.sources.DataSourceException;
+import main.java.de.tw.ecm.toolkit.service.RepositoryService;
 import main.java.de.tw.ecm.toolkit.view.AbstractController;
 
 import org.controlsfx.dialog.Dialogs;
@@ -37,16 +39,17 @@ public class LoginController extends AbstractController {
 	public void initialize(URL location, ResourceBundle resources) {
 		super.initialize(location, resources);
 		try {
-			final Repositories repositories = new Repositories().build();
+			final RepositoryService service = RepositoryService.getService();
+			// final Repositories repositories = new Repositories().build();
 			ObservableList<String> options = FXCollections
-					.observableArrayList(repositories.getRepositoryCaptions());
+					.observableArrayList(service.getRepositories().getRepositoryCaptions());
 			this.cmbRepository.setItems(options);
 			this.cmbRepository.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent e) {
 					String selected = cmbRepository.getValue().toString();
-					repositories.setSelectedRepository(selected);
-					selectedRepository = repositories.getSelectedRepository();
+					service.setSelectedRepository(selected);
+					selectedRepository = service.getSelectedRepository();
 					try {
 						selectedRepository.initialize();
 					} catch (RepositoryException e1) {
@@ -56,17 +59,20 @@ public class LoginController extends AbstractController {
 				}
 			});
 
-			// show the default repo as default in the combobox
-			this.cmbRepository.setValue(repositories.getDefaultRepository()
-					.getCaption());
+			service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+				public void handle(WorkerStateEvent event) {
+					// show the default repo as default in the combobox
+					cmbRepository.setValue(service.getDefaultRepository()
+							.getCaption());
 
-			if (this.context.getCommandLine().hasOption("user"))
-				this.setUsername(this.context.getCommandLine().getOptionValue(
-						"user"));
-			if (this.context.getCommandLine().hasOption("password"))
-				this.setPassword(this.context.getCommandLine().getOptionValue(
-						"password"));
-
+					if (context.getCommandLine().hasOption("user"))
+						setUsername(context.getCommandLine().getOptionValue(
+								"user"));
+					if (context.getCommandLine().hasOption("password"))
+						setPassword(context.getCommandLine().getOptionValue(
+								"password"));
+				};
+			});
 		} catch (Exception e) {
 			Dialogs.create().showException(e);
 		}

@@ -63,7 +63,7 @@ public class RepositoryTest {
 		repository.setEntities(this.createEntities());
 		
 		Repositories repositories = new Repositories();
-		repositories.setDefaultRepository("MySQL_ECMToolkit1");
+		repositories.setDefault("MySQL_ECMToolkit1");
 		repositories.add(repository);
 
 		return repositories;

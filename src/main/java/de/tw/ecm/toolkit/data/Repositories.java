@@ -8,17 +8,14 @@ import javax.xml.bind.JAXB;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.commons.lang3.builder.Builder;
 
 @XmlRootElement(name = "repositories")
-public class Repositories extends Values<Repository> implements Builder<Repositories>,
-		Iterable<Repository> {
+public class Repositories extends Values<Repository> implements
+		Builder<Repositories>, Iterable<Repository> {
 
 	private String defaultRepo;
-
-	private Repository selected;
 
 	public Repositories() {
 	}
@@ -50,20 +47,12 @@ public class Repositories extends Values<Repository> implements Builder<Reposito
 		return this.values;
 	}
 
-	public Repository getDefaultRepository() {
-		return this.getById(defaultRepo);
-	}
-
 	@XmlAttribute(name = "default")
 	public String getDefault() {
 		return this.defaultRepo;
 	}
 
 	public void setDefault(String defaultRepo) {
-		this.defaultRepo = defaultRepo;
-	}
-
-	public void setDefaultRepository(String defaultRepo) {
 		this.defaultRepo = defaultRepo;
 	}
 
@@ -83,15 +72,6 @@ public class Repositories extends Values<Repository> implements Builder<Reposito
 		}
 
 		return captions;
-	}
-
-	@XmlTransient
-	public Repository getSelectedRepository() {
-		return selected;
-	}
-
-	public void setSelectedRepository(String selected) {
-		this.selected = this.getByCaption(selected);
 	}
 
 	public String toXml() {
