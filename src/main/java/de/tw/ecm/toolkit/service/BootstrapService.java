@@ -7,43 +7,41 @@ import javafx.event.EventHandler;
 import main.java.de.tw.ecm.toolkit.data.Repositories;
 import main.java.de.tw.ecm.toolkit.data.Repository;
 
-public class RepositoryService extends Service<Repositories> {
+public class BootstrapService extends Service<Void> {
 
-	private static RepositoryService service;
+	private static BootstrapService service;
 
 	private Repository selected;
 
 	private Repositories repositories;
 
-	public static synchronized RepositoryService getService() {
+	public static synchronized BootstrapService getService() {
 		if (service == null)
-			service = new RepositoryService();
+			service = new BootstrapService();
 		return service;
 	}
 
-	private RepositoryService() {
+	private BootstrapService() {
 		start();
-		setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-			@Override
-			public void handle(WorkerStateEvent event) {
-				repositories = service.getValue();
-			}
-		});
 	}
 
 	@Override
-	protected Task<Repositories> createTask() {
-		return new Task<Repositories>() {
+	protected Task<Void> createTask() {
+		return new Task<Void>() {
 			@Override
-			protected Repositories call() throws Exception {
-				return new Repositories().build();
+			protected Void call() throws Exception {
+				repositories = new Repositories().build();
+				return null;
 			}
 		};
 	}
 
 	public Repositories getRepositories() {
 		try {
-			return (Repositories) repositories.clone();
+			if(repositories != null)
+				return (Repositories) repositories.clone();
+			else
+				return null;
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException(e);
 		}

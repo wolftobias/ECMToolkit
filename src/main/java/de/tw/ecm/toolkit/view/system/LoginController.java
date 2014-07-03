@@ -12,11 +12,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
-import main.java.de.tw.ecm.toolkit.data.Repositories;
 import main.java.de.tw.ecm.toolkit.data.RepositoryException;
-import main.java.de.tw.ecm.toolkit.data.sources.DataSourceException;
-import main.java.de.tw.ecm.toolkit.service.RepositoryService;
+import main.java.de.tw.ecm.toolkit.service.BootstrapService;
+import main.java.de.tw.ecm.toolkit.service.DataSourceLogin;
 import main.java.de.tw.ecm.toolkit.view.AbstractController;
 
 import org.controlsfx.dialog.Dialogs;
@@ -34,16 +34,15 @@ public class LoginController extends AbstractController {
 	Label lblErrorMessage;
 	@FXML
 	ComboBox<String> cmbRepository;
+	
+	@FXML
+	ProgressBar progressBar;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		super.initialize(location, resources);
 		try {
-			final RepositoryService service = RepositoryService.getService();
-			// final Repositories repositories = new Repositories().build();
-			ObservableList<String> options = FXCollections
-					.observableArrayList(service.getRepositories().getRepositoryCaptions());
-			this.cmbRepository.setItems(options);
+			final BootstrapService service = BootstrapService.getService();
 			this.cmbRepository.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent e) {
@@ -52,6 +51,7 @@ public class LoginController extends AbstractController {
 					selectedRepository = service.getSelectedRepository();
 					try {
 						selectedRepository.initialize();
+						currentDataSource = selectedRepository.getDataSource();
 					} catch (RepositoryException e1) {
 						handleException(e1);
 					}
@@ -61,6 +61,10 @@ public class LoginController extends AbstractController {
 
 			service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 				public void handle(WorkerStateEvent event) {
+					ObservableList<String> options = FXCollections
+							.observableArrayList(service.getRepositories()
+									.getRepositoryCaptions());
+					cmbRepository.setItems(options);
 					// show the default repo as default in the combobox
 					cmbRepository.setValue(service.getDefaultRepository()
 							.getCaption());
@@ -79,17 +83,18 @@ public class LoginController extends AbstractController {
 	}
 
 	public void onLogin(ActionEvent event) {
-		try {
-			boolean login = this.selectedRepository.getDataSource().login(
-					this.txtUsername.getText(), this.pwdPassword.getText());
-
-			if (login) {
-				this.context.getViewContext().showMainView();
-			} else
-				this.lblErrorMessage.setText("Login fehlgeschlagen!");
-		} catch (DataSourceException e) {
-			Dialogs.create().showException(e);
-		}
+		DataSourceLogin loginService = new DataSourceLogin(currentDataSource,
+				this.txtUsername.getText(), this.pwdPassword.getText());
+		loginService.start();
+		loginService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent arg0) {
+				if (loginService.getValue()) {
+					context.getViewContext().showMainView();
+				} else
+					lblErrorMessage.setText("Login fehlgeschlagen!");
+			}
+		});
 	}
 
 	public void onCancel(ActionEvent event) {

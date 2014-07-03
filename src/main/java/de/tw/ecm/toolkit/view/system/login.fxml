@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import java.net.*?>
@@ -26,12 +27,12 @@
             <Button id="btnCancel" cancelButton="true" layoutX="241.0" layoutY="210.0" mnemonicParsing="false" onAction="#onCancel" text="%btnCancel" />
             <Label id="label1" layoutX="87.0" layoutY="184.0" text="%cmbRepository" />
             <ComboBox id="cmbRepository" fx:id="cmbRepository" layoutX="166.0" layoutY="180.0" prefWidth="150.0" />
+            <Label fx:id="lblErrorMessage" alignment="CENTER" layoutX="164.0" layoutY="82.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="25.0" prefWidth="149.0" textFill="RED">
+               <effect>
+                  <Blend />
+               </effect></Label>
          </children>
       </AnchorPane>
-      <HBox layoutX="165.0" layoutY="242.0" prefHeight="44.0" prefWidth="161.0">
-         <children>
-            <Label fx:id="lblErrorMessage" alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" textFill="RED" />
-         </children>
-      </HBox>
+      <ProgressBar fx:id="progressBar" layoutX="88.0" layoutY="251.0" prefHeight="18.0" prefWidth="232.0" progress="0.0" />
    </children>
 </AnchorPane>
