@@ -13,7 +13,7 @@
    <bottom>
       <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" BorderPane.alignment="CENTER">
          <children>
-            <Label maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Left status" HBox.hgrow="ALWAYS">
+            <Label fx:id="lblUser" maxHeight="1.7976931348623157E308" maxWidth="-1.0" HBox.hgrow="ALWAYS">
                <font>
                   <Font size="11.0" fx:id="x3" />
                </font>
@@ -21,21 +21,14 @@
                   <Color blue="0.625" green="0.625" red="0.625" fx:id="x4" />
                </textFill>
             </Label>
-            <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
-            <Label font="$x3" maxWidth="-1.0" text="Right status" textFill="$x4" HBox.hgrow="NEVER" />
+            <Pane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
+            <Label fx:id="lblDateTime" font="$x3" maxWidth="-1.0" textFill="$x4" HBox.hgrow="NEVER" />
          </children>
          <padding>
             <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
          </padding>
       </HBox>
    </bottom>
-   <center>
-      <SplitPane fx:id="splitPane" dividerPositions="0.2">
-         <items>
-            <TabPane fx:id="navigationTabPane" tabClosingPolicy="UNAVAILABLE" />
-            <TabPane fx:id="contentTabPane" tabClosingPolicy="UNAVAILABLE" />
-         </items></SplitPane>
-   </center>
    <top>
       <MenuBar BorderPane.alignment="CENTER">
          <menus>
@@ -69,4 +62,17 @@
          </menus>
       </MenuBar>
    </top>
+   <center>
+      <SplitPane dividerPositions="0.8" orientation="VERTICAL" BorderPane.alignment="CENTER">
+         <items>
+            <SplitPane fx:id="splitPane" dividerPositions="0.2" BorderPane.alignment="CENTER">
+               <items>
+                  <TabPane fx:id="navigationTabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" tabClosingPolicy="UNAVAILABLE" />
+                  <TabPane fx:id="contentTabPane" tabClosingPolicy="UNAVAILABLE" />
+               </items>
+            </SplitPane>
+            <TabPane fx:id="monitoringTabPane" prefHeight="150.0" tabClosingPolicy="UNAVAILABLE" />
+         </items>
+      </SplitPane>
+   </center>
 </BorderPane>

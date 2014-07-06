@@ -2,6 +2,7 @@ package main.java.de.tw.ecm.toolkit.data.sources;
 
 import java.util.List;
 
+import main.java.de.tw.ecm.toolkit.auth.User;
 import main.java.de.tw.ecm.toolkit.data.DataList;
 import main.java.de.tw.ecm.toolkit.data.ECMProperties;
 import main.java.de.tw.ecm.toolkit.data.Entities;
@@ -16,8 +17,7 @@ public interface DataSource {
 
 	public void destroy() throws DataSourceException;
 
-	public boolean login(String username, String password)
-			throws DataSourceException;
+	public void login(User user) throws DataSourceException;
 
 	public Entities getEntities() throws DataSourceException;
 

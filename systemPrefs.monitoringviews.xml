@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<monitoringviews default="Console">
+    <monitoringView id="Console">
+        <controller>main.java.de.tw.ecm.toolkit.view.plugins.ConsoleController</controller>
+        <resources>console.properties</resources>
+        <fxml>console.fxml</fxml>
+    </monitoringView>
+        <monitoringView id="RunningServices">
+        <controller>main.java.de.tw.ecm.toolkit.view.plugins.RunningServicesController</controller>
+        <resources>runningservices.properties</resources>
+        <fxml>runningservices.fxml</fxml>
+    </monitoringView>
+</monitoringviews>

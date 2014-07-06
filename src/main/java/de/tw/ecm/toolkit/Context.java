@@ -9,21 +9,27 @@ import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import main.java.de.tw.ecm.toolkit.auth.User;
 import main.java.de.tw.ecm.toolkit.data.Repository;
+import main.java.de.tw.ecm.toolkit.data.sources.DataSource;
 import main.java.de.tw.ecm.toolkit.prefs.PreferencesFactory;
 import main.java.de.tw.ecm.toolkit.prefs.SystemPreferences;
 import main.java.de.tw.ecm.toolkit.prefs.UserPreferences;
 import main.java.de.tw.ecm.toolkit.view.ContentView;
+import main.java.de.tw.ecm.toolkit.view.MonitoringView;
+import main.java.de.tw.ecm.toolkit.view.MonitoringViews;
 import main.java.de.tw.ecm.toolkit.view.NavigationView;
+import main.java.de.tw.ecm.toolkit.view.NavigationViews;
 import main.java.de.tw.ecm.toolkit.view.View;
 import main.java.de.tw.ecm.toolkit.view.Views;
+import main.java.de.tw.ecm.toolkit.view.plugins.AbstractUserController;
 import main.java.de.tw.ecm.toolkit.view.system.LoginController;
 import main.java.de.tw.ecm.toolkit.view.system.MainController;
-import main.java.de.tw.ecm.toolkit.view.user.AbstractUserController;
 
 import org.apache.commons.cli.CommandLine;
 
@@ -46,6 +52,10 @@ public class Context {
 	private ViewContext viewContext;
 
 	private Repository selectedRepository;
+
+	private DataSource dataSource;
+
+	private User user;
 
 	private Context() {
 		this.systemPrefs = PreferencesFactory.systemPrefs();
@@ -112,6 +122,22 @@ public class Context {
 		this.selectedRepository = selectedRepository;
 	}
 
+	public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	public class ViewContext {
 
 		private Stage primaryStage;
@@ -143,25 +169,38 @@ public class Context {
 
 				Views views = new Views().build();
 				for (View view : views) {
-					for (NavigationView navigationView : view) {
-						Pane navigationPane = replaceSceneContent(
-								navigationView.getControllerClass(),
-								navigationView.getResources(),
-								navigationView.getFxml());
-						String navigationViewCaption = ((AbstractUserController) get(navigationView
-								.getController())).getCaption();
-						main.addNavigationTab(navigationViewCaption,
-								navigationPane);
-						for (ContentView contentView : navigationView) {
-							Pane contentPane = replaceSceneContent(
-									contentView.getControllerClass(),
-									contentView.getResources(),
-									contentView.getFxml());
-							String contentPaneCaption = ((AbstractUserController) get(contentView
+					for (NavigationViews navigationViews : view) {
+						for (NavigationView navigationView : navigationViews) {
+							Node navigation = replaceSceneContent(
+									navigationView.getControllerClass(),
+									navigationView.getResources(),
+									navigationView.getFxml());
+							String navigationViewCaption = ((AbstractUserController) get(navigationView
 									.getController())).getCaption();
-							main.addContentTab(contentPaneCaption, contentPane);
+							main.addNavigationTab(navigationViewCaption,
+									navigation);
+							for (ContentView contentView : navigationView) {
+								Node content = replaceSceneContent(
+										contentView.getControllerClass(),
+										contentView.getResources(),
+										contentView.getFxml());
+								String contentViewCaption = ((AbstractUserController) get(contentView
+										.getController())).getCaption();
+								main.addContentTab(contentViewCaption, content);
+							}
 						}
 					}
+				}
+
+				MonitoringViews monitoringViews = new MonitoringViews().build();
+				for (MonitoringView monitoringView : monitoringViews) {
+					Node monitoring = replaceSceneContent(
+							monitoringView.getControllerClass(),
+							monitoringView.getResources(),
+							monitoringView.getFxml());
+					String contentViewCaption = ((AbstractUserController) get(monitoringView
+							.getController())).getCaption();
+					main.addMonitoringTab(contentViewCaption, monitoring);
 				}
 			} catch (Exception ex) {
 				Logger.getLogger(ECMToolkit.class.getName()).log(Level.SEVERE,
@@ -200,7 +239,7 @@ public class Context {
 			return (Initializable) loader.getController();
 		}
 
-		private Pane replaceSceneContent(Class controller,
+		private Node replaceSceneContent(Class controller,
 				String resourcesFile, String fxmlFile) throws Exception {
 			String path = controller.getPackage().getName();
 			FXMLLoader loader = new FXMLLoader();
@@ -211,16 +250,22 @@ public class Context {
 			loader.setResources(new PropertyResourceBundle(controller
 					.getResourceAsStream(resourcesFile)));
 
-			Pane pane;
+			Node node;
 			try {
-				pane = loader.load(in);
+				node = loader.load(in);
 			} finally {
 				in.close();
 			}
 
-			put(loader.getController());
+			Object controllerObj = loader.getController();
+			if (controllerObj == null)
+				throw new IllegalArgumentException(
+						"Controller class '"
+								+ controller.getName()
+								+ "' is null! Please check if you`ve set the controller in the fxm file!");
 
-			return pane;
+			put(controllerObj);
+			return node;
 		}
 
 	}

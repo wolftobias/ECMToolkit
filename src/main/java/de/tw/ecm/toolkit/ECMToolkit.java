@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import main.java.de.tw.ecm.toolkit.data.sources.DataSource;
 import main.java.de.tw.ecm.toolkit.data.sources.DataSourceException;
 
 import org.apache.commons.cli.BasicParser;
@@ -40,8 +41,9 @@ public class ECMToolkit extends Application {
 			public void run() {
 				try {
 					log.info("JVM was terminated!");
-					Context.context().getSelectedRepository().getDataSource()
-							.destroy();
+					DataSource dataSource = context.getDataSource();
+					if (dataSource != null)
+						dataSource.destroy();
 				} catch (DataSourceException e) {
 					throw new RuntimeException(e);
 				}
@@ -68,8 +70,8 @@ public class ECMToolkit extends Application {
 
 	private void parseCmd(Parameters parameters) throws ParseException {
 		Options options = new Options();
-		options.addOption("u", "user", true, "user login name");
-		options.addOption("p", "password", true, "user password");
+		options.addOption("u", "userid", true, "userid login name");
+		options.addOption("p", "password", true, "userid password");
 
 		List<String> rawList = parameters.getRaw();
 
@@ -81,7 +83,7 @@ public class ECMToolkit extends Application {
 
 	@Override
 	public void stop() throws Exception {
-		this.context.getSelectedRepository().getDataSource().destroy();
+		this.context.getDataSource().destroy();
 	}
 
 	public Stage getPrimaryStage() {

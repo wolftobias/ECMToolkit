@@ -2,16 +2,14 @@ package main.java.de.tw.ecm.toolkit.view;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType(propOrder = { "id", "user", "group", "default", "views" })
-public class View extends BaseViews<NavigationView> {
+public class View extends BaseViews<NavigationViews> {
+
+	private String id;
 
 	private String user;
 
@@ -22,22 +20,8 @@ public class View extends BaseViews<NavigationView> {
 	public View() {
 	}
 
-	public NavigationView getDefaultNavigationView() {
-		return this.getById(this.defaultView);
-	}
-
-	public NavigationView getById(String id) {
-		for (NavigationView view : this.values) {
-			if (view.getId().equals(id))
-				return view;
-		}
-
-		return null;
-	}
-
-	@XmlElementWrapper(name = "navigationviews")
-	@XmlElement(name = "navigationview")
-	public List<NavigationView> getViews() {
+	@XmlElement(name = "navigationviews")
+	public List<NavigationViews> getViews() {
 		return this.values;
 	}
 
@@ -59,15 +43,13 @@ public class View extends BaseViews<NavigationView> {
 		this.group = group;
 	}
 
-	@Override
 	@XmlAttribute
 	public String getId() {
-		return super.getId();
+		return this.id;
 	}
 
-	@Override
 	public void setId(String id) {
-		super.setId(id);
+		this.id = id;
 	}
 
 	@Override
@@ -83,8 +65,8 @@ public class View extends BaseViews<NavigationView> {
 
 	@Override
 	public View build() {
-		for (NavigationView navigationView : this.values) {
-			navigationView.build();
+		for (NavigationViews views : values) {
+			views.build();
 		}
 
 		return this;

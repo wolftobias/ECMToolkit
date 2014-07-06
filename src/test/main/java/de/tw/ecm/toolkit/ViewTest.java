@@ -10,6 +10,7 @@ import javax.xml.bind.JAXB;
 
 import main.java.de.tw.ecm.toolkit.view.ContentView;
 import main.java.de.tw.ecm.toolkit.view.NavigationView;
+import main.java.de.tw.ecm.toolkit.view.NavigationViews;
 import main.java.de.tw.ecm.toolkit.view.View;
 import main.java.de.tw.ecm.toolkit.view.Views;
 
@@ -38,37 +39,36 @@ public class ViewTest {
 			JAXB.marshal(views, fileOut);
 
 			Views unmarshal = JAXB.unmarshal(fileIn, Views.class);
-			System.out.println(unmarshal.toString());
+			JAXB.marshal(unmarshal, System.out);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	private Views createViews() {
+		ContentView contentView = new ContentView();
+		contentView.setController("main.java.de.tw.ecm.toolkit.view.plugins.QueryAnalyserController");
+		contentView.setFxml("queryanalyser.fxml");
+		contentView.setId("QueryAnalyser");
+		contentView.setResources("queryanalyser.properties");
+
+		NavigationView navigationView = new NavigationView();
+		navigationView.setController("main.java.de.tw.ecm.toolkit.view.plugins.DataSourceExplorerController");
+		navigationView.setFxml("datasourceexplorer.fxml");
+		navigationView.setId("DataSourceTree");
+		navigationView.setResources("datasourceexplorer.properties");
+		navigationView.add(contentView);
+		
+		NavigationViews navigationViews = new NavigationViews();
+		navigationViews.setDefault("QueryAnalyser");
+		navigationViews.add(navigationView);
+		
 		View view = new View();
 		view.setId("QueryAnalyser");
 		view.setUser("*");
 		view.setGroup("*");
 		view.setDefault("DataSourceTree");
-
-		NavigationView navigationView = new NavigationView();
-		navigationView
-				.setController("main.java.de.tw.ecm.toolkit.view.user.DataSourceExplorerController");
-		navigationView.setDefault("QueryAnalyser");
-		navigationView.setFxml("datasourceexplorer.fxml");
-		navigationView.setId("DataSourceTree");
-		navigationView.setResources("datasourceexplorer.properties");
-
-		ContentView contentView = new ContentView();
-		contentView
-				.setController("main.java.de.tw.ecm.toolkit.view.user.QueryAnalyserController");
-		contentView.setDefault("QueryAnalyser");
-		contentView.setFxml("queryanalyser.fxml");
-		contentView.setId("QueryAnalyser");
-		contentView.setResources("queryanalyser.properties");
-
-		navigationView.add(contentView);
-		view.add(navigationView);
+		view.add(navigationViews);
 
 		Views views = new Views();
 		views.add(view);

@@ -1,14 +1,15 @@
 package main.java.de.tw.ecm.toolkit.view;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.commons.lang3.builder.Builder;
 
+@XmlTransient
 public class BaseView implements Builder<BaseView> {
 
 	protected String id;
-
-	protected String defaultView;
 
 	protected String controller;
 
@@ -22,15 +23,6 @@ public class BaseView implements Builder<BaseView> {
 	}
 
 	@XmlTransient
-	public String getController() {
-		return controller;
-	}
-
-	public void setController(String controller) {
-		this.controller = controller;
-	}
-
-	@XmlTransient
 	public Class getControllerClass() {
 		return controllerClass;
 	}
@@ -39,40 +31,40 @@ public class BaseView implements Builder<BaseView> {
 		this.controllerClass = controllerClass;
 	}
 
-	@XmlTransient
-	public String getResources() {
-		return resources;
+	@XmlAttribute
+	public String getId() {
+		return this.id;
 	}
 
-	public void setResources(String resources) {
-		this.resources = resources;
+	public void setId(String id) {
+		this.id = id;
 	}
 
-	@XmlTransient
+	@XmlElement
 	public String getFxml() {
-		return fxml;
+		return this.fxml;
 	}
 
 	public void setFxml(String fxml) {
 		this.fxml = fxml;
 	}
 
-	@XmlTransient
-	public String getDefault() {
-		return defaultView;
+	@XmlElement
+	public String getResources() {
+		return this.resources;
 	}
 
-	public void setDefault(String defaultView) {
-		this.defaultView = defaultView;
+	public void setResources(String resources) {
+		this.resources = resources;
 	}
 
-	@XmlTransient
-	public String getId() {
-		return id;
+	@XmlElement
+	public String getController() {
+		return this.controller;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setController(String controller) {
+		this.controller = controller;
 	}
 
 	@Override
@@ -82,7 +74,6 @@ public class BaseView implements Builder<BaseView> {
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
-
 		return this;
 	}
 }

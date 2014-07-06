@@ -1,27 +1,23 @@
 package main.java.de.tw.ecm.toolkit.view;
 
-import java.io.File;
 import java.util.List;
 
-import javax.xml.bind.JAXB;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "views")
-public class Views extends BaseViews<View> {
+public class ContentViews extends BaseViews<ContentView> {
 
 	private String defaultView;
 
-	public Views() {
+	public ContentViews() {
 	}
 
-	public Views(List<View> view) {
+	public ContentViews(List<ContentView> view) {
 		this.values = view;
 	}
 
-	public View getById(String id) {
-		for (View view : this.values) {
+	public ContentView getById(String id) {
+		for (ContentView view : this.values) {
 			if (view.getId().equals(id))
 				return view;
 		}
@@ -30,11 +26,11 @@ public class Views extends BaseViews<View> {
 	}
 
 	@XmlElement(name = "view")
-	public List<View> getViews() {
+	public List<ContentView> getViews() {
 		return this.values;
 	}
 
-	public View getDefaultView() {
+	public ContentView getDefaultView() {
 		return this.getById(this.defaultView);
 	}
 
@@ -45,14 +41,11 @@ public class Views extends BaseViews<View> {
 	}
 
 	@Override
-	public Views build() {
-		Views views = JAXB.unmarshal(new File("./systemPrefs.views.xml"),
-				Views.class);
-
-		for (View view : views) {
+	public ContentViews build() {
+		for (ContentView view : this.values) {
 			view.build();
 		}
 
-		return views;
+		return this;
 	}
 }

@@ -1,13 +1,13 @@
 package main.java.de.tw.ecm.toolkit.view;
 
+import static org.apache.commons.lang3.Validate.notNull;
+
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javafx.fxml.Initializable;
 import main.java.de.tw.ecm.toolkit.Context;
-import main.java.de.tw.ecm.toolkit.data.Repositories;
 import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.data.sources.DataSource;
 
@@ -22,8 +22,6 @@ public abstract class AbstractController implements Initializable {
 
 	protected Repository selectedRepository;
 
-	protected DataSource currentDataSource;
-	
 	protected Context context;
 
 	protected URL location;
@@ -37,16 +35,34 @@ public abstract class AbstractController implements Initializable {
 		this.resources = resources;
 		this.context = Context.context();
 		this.context.put(this);
-		
+
 		try {
 			this.selectedRepository = this.context.getSelectedRepository();
 		} catch (Exception e) {
-			this.handleException(e);
+			this.handleException(this, "<init>", e);
 		}
 	}
 
-	protected void handleException(Exception e) {
-		log.log(Level.SEVERE, "An error was thrown!", e);
-		Dialogs.create().showException(e);
+	protected void handleException(Object source, String sourceMethod,
+			Throwable thrown) {
+		notNull(source);
+		notNull(thrown);
+
+		this.handleException(source.getClass().getName(), sourceMethod, thrown);
 	}
+
+	protected void handleException(Class sourceClass, String sourceMethod,
+			Throwable thrown) {
+		notNull(sourceClass);
+		notNull(thrown);
+
+		this.handleException(sourceClass.getName(), sourceMethod, thrown);
+	}
+
+	protected void handleException(String sourceClass, String sourceMethod,
+			Throwable thrown) {
+		log.throwing(sourceClass, sourceMethod, thrown);
+		Dialogs.create().showException(thrown);
+	}
+
 }

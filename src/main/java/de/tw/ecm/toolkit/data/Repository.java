@@ -9,7 +9,6 @@ import javax.xml.bind.annotation.XmlType;
 
 import main.java.de.tw.ecm.toolkit.data.ECMProperties.ECMProperty;
 import main.java.de.tw.ecm.toolkit.data.sources.DataSource;
-import main.java.de.tw.ecm.toolkit.data.sources.DataSourceException;
 
 import org.apache.commons.lang3.builder.Builder;
 
@@ -23,8 +22,6 @@ public class Repository implements Builder<Repository> {
 	private String id;
 
 	private ECMProperties properties = new ECMProperties();
-
-	private DataSource dataSource;
 
 	private String dataSourceClassname;
 
@@ -64,8 +61,13 @@ public class Repository implements Builder<Repository> {
 	public List<ECMProperty> getProperties() {
 		return properties.getProperties();
 	}
+	
+	@XmlTransient
+	public ECMProperties getECMProperties() {
+		return properties;
+	}
 
-	public void setProperties(ECMProperties properties) {
+	public void setECMProperties(ECMProperties properties) {
 		this.properties = properties;
 	}
 
@@ -77,10 +79,6 @@ public class Repository implements Builder<Repository> {
 		return this.properties.getProperty(key);
 	}
 
-	public DataSource getDataSource() {
-		return dataSource;
-	}
-
 	@XmlAttribute(name = "class")
 	public String getDataSourceClassname() {
 		return dataSourceClassname;
@@ -90,55 +88,13 @@ public class Repository implements Builder<Repository> {
 		this.dataSourceClassname = dataSourceClassname;
 	}
 
-	@XmlElement
-	public Entities getEntities() throws RepositoryException {
-		try {
-			Entities nativeEntities = this.getDataSource().getEntities();
-
-			for (Entity nativeEntity : nativeEntities) {
-				String nativeId = nativeEntity.getId();
-				Entity entity = this.entities.getById(nativeId);
-				if (entity != null) {
-					nativeEntity.setCaption(entity.getCaption());
-					mergeAttributes(entity.getAttributes(),
-							nativeEntity.getAttributes());
-				}
-			}
-
-			this.entities = nativeEntities;
-		} catch (DataSourceException e) {
-			throw new RepositoryException(e);
-		}
-		
-		return this.entities;
-	}
-
-	private void mergeAttributes(Attributes attributes,
-			Attributes nativeAttributes) {
-		for (Attribute nativeAttribute : nativeAttributes) {
-			String nativeName = nativeAttribute.getName();
-			Attribute attribute = attributes.getByName(nativeName);
-			
-			if(attribute != null)
-				this.mergeAttribute(attribute, nativeAttribute);
-		}
-	}
-
-	private void mergeAttribute(Attribute attribute, Attribute nativeAttribute) {
-		nativeAttribute.setCaption(attribute.getCaption());
-	}
-
 	public void setEntities(Entities entities) {
 		this.entities = entities;
 	}
 
-	public void initialize() throws RepositoryException {
-		try {
-			this.dataSource = (DataSource) dataSourceClass.newInstance();
-			this.dataSource.initialize(this, this.properties);
-		} catch (Exception e) {
-			throw new RepositoryException(e);
-		}
+	@XmlElement
+	public Entities getEntities() {
+		return entities;
 	}
 
 	@Override
@@ -151,7 +107,7 @@ public class Repository implements Builder<Repository> {
 
 		return this;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		return this.id.equals(obj);
@@ -165,5 +121,5 @@ public class Repository implements Builder<Repository> {
 	@Override
 	public int hashCode() {
 		return id.hashCode();
-	}	
+	}
 }

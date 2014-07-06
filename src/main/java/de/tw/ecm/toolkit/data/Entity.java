@@ -1,8 +1,5 @@
 package main.java.de.tw.ecm.toolkit.data;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -19,8 +16,8 @@ public class Entity {
 
 	private Attributes attributes = new Attributes();
 
-	private PrimaryKeys primaryKeys = new PrimaryKeys(); 
-	
+	private PrimaryKeys primaryKeys = new PrimaryKeys();
+
 	public Entity() {
 	}
 

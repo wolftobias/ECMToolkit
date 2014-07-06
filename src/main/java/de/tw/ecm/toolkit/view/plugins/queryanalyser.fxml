@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.input.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.java.de.tw.ecm.toolkit.view.plugins.QueryAnalyserController">
+   <top>
+      <ToolBar fx:id="toolBar" disable="true" prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <items>
+            <Button fx:id="playButton" mnemonicParsing="false" onAction="#onPlay" text="Play" />
+            <Button fx:id="exportButton" layoutX="10.0" layoutY="13.0" mnemonicParsing="false" onAction="#onExport" text="Export" />
+            <Button fx:id="importButton" layoutX="52.0" layoutY="13.0" mnemonicParsing="false" onAction="#onImport" text="Import" />
+            <ChoiceBox fx:id="queryChoiceBox" prefWidth="150.0" />
+         </items>
+      </ToolBar>
+   </top>
+   <center>
+      <SplitPane dividerPositions="0.1" orientation="VERTICAL" BorderPane.alignment="CENTER">
+         <items>
+            <ScrollPane fitToHeight="true" fitToWidth="true">
+               <content>
+                  <TextArea fx:id="queryTextArea" />
+               </content>
+            </ScrollPane>
+            <ScrollPane fitToHeight="true" fitToWidth="true" prefViewportHeight="714.0" prefViewportWidth="712.0">
+               <content>
+                  <TableView fx:id="tableView" editable="true" tableMenuButtonVisible="true">
+                     <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                     </columnResizePolicy>
+                     <contextMenu>
+                        <ContextMenu>
+                          <items>
+                            <MenuItem mnemonicParsing="false" onAction="#onDeleteRow" text="%tableView.popup.delete" />
+                          </items>
+                        </ContextMenu>
+                     </contextMenu></TableView>
+               </content>
+            </ScrollPane>
+         </items>
+      </SplitPane>
+   </center>
+</BorderPane>

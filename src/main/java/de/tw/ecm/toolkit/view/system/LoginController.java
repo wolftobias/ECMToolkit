@@ -14,12 +14,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Pane;
+import main.java.de.tw.ecm.toolkit.auth.User;
 import main.java.de.tw.ecm.toolkit.data.RepositoryException;
 import main.java.de.tw.ecm.toolkit.service.BootstrapService;
-import main.java.de.tw.ecm.toolkit.service.DataSourceLogin;
+import main.java.de.tw.ecm.toolkit.service.LoginService;
 import main.java.de.tw.ecm.toolkit.view.AbstractController;
-
-import org.controlsfx.dialog.Dialogs;
 
 /**
  * Login Controller.
@@ -31,68 +31,112 @@ public class LoginController extends AbstractController {
 	@FXML
 	PasswordField pwdPassword;
 	@FXML
-	Label lblErrorMessage;
+	Pane loginPane;
 	@FXML
 	ComboBox<String> cmbRepository;
-	
 	@FXML
 	ProgressBar progressBar;
+	@FXML
+	Label lblStatus;
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		super.initialize(location, resources);
 		try {
-			final BootstrapService service = BootstrapService.getService();
+			final BootstrapService bootstrapService = new BootstrapService();
 			this.cmbRepository.setOnAction(new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent e) {
-					String selected = cmbRepository.getValue().toString();
-					service.setSelectedRepository(selected);
-					selectedRepository = service.getSelectedRepository();
 					try {
-						selectedRepository.initialize();
-						currentDataSource = selectedRepository.getDataSource();
+						String selected = cmbRepository.getValue().toString();
+						bootstrapService.selectedRepositoryByCaption(selected);
+						selectedRepository = bootstrapService
+								.getSelectedRepository();
+						context.setSelectedRepository(selectedRepository);
 					} catch (RepositoryException e1) {
-						handleException(e1);
+						handleException(this, "initialize", e1);
 					}
-					context.setSelectedRepository(selectedRepository);
 				}
 			});
 
-			service.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-				public void handle(WorkerStateEvent event) {
-					ObservableList<String> options = FXCollections
-							.observableArrayList(service.getRepositories()
-									.getRepositoryCaptions());
-					cmbRepository.setItems(options);
-					// show the default repo as default in the combobox
-					cmbRepository.setValue(service.getDefaultRepository()
-							.getCaption());
+			bootstrapService
+					.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+						public void handle(WorkerStateEvent event) {
+							lblStatus.setVisible(false);
+							progressBar.setVisible(false);
+							ObservableList<String> options = FXCollections
+									.observableArrayList(bootstrapService
+											.getRepositories()
+											.getRepositoryCaptions());
+							cmbRepository.setItems(options);
+							// show the default repo as default in the combobox
+							cmbRepository.setValue(bootstrapService
+									.getDefaultRepository().getCaption());
 
-					if (context.getCommandLine().hasOption("user"))
-						setUsername(context.getCommandLine().getOptionValue(
-								"user"));
-					if (context.getCommandLine().hasOption("password"))
-						setPassword(context.getCommandLine().getOptionValue(
-								"password"));
-				};
+							if (context.getCommandLine().hasOption("userid"))
+								setUsername(context.getCommandLine()
+										.getOptionValue("userid"));
+							if (context.getCommandLine().hasOption("password"))
+								setPassword(context.getCommandLine()
+										.getOptionValue("password"));
+						};
+					});
+
+			bootstrapService.setOnRunning(new EventHandler<WorkerStateEvent>() {
+				@Override
+				public void handle(WorkerStateEvent event) {
+					lblStatus.setVisible(true);
+					lblStatus.textProperty().bind(
+							bootstrapService.messageProperty());
+					progressBar.progressProperty().bind(
+							bootstrapService.progressProperty());
+				}
+			});
+
+			bootstrapService.setOnFailed(new EventHandler<WorkerStateEvent>() {
+				@Override
+				public void handle(WorkerStateEvent arg0) {
+					lblStatus.setVisible(false);
+					progressBar.setVisible(false);
+					handleException(bootstrapService, "setOnFailed",
+							bootstrapService.getException());
+				}
 			});
 		} catch (Exception e) {
-			Dialogs.create().showException(e);
+			this.handleException(this, "initialize", e);
 		}
 	}
 
 	public void onLogin(ActionEvent event) {
-		DataSourceLogin loginService = new DataSourceLogin(currentDataSource,
-				this.txtUsername.getText(), this.pwdPassword.getText());
-		loginService.start();
+		this.loginPane.setDisable(true);
+		User user = new User(txtUsername.getText(), pwdPassword.getText());
+		LoginService loginService = new LoginService(user);
 		loginService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
-			public void handle(WorkerStateEvent arg0) {
-				if (loginService.getValue()) {
-					context.getViewContext().showMainView();
-				} else
-					lblErrorMessage.setText("Login fehlgeschlagen!");
+			public void handle(WorkerStateEvent event) {
+				context.setUser(user);
+				context.getViewContext().showMainView();
+			}
+		});
+
+		loginService.setOnRunning(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent event) {
+				lblStatus.setVisible(true);
+				progressBar.setVisible(true);
+				lblStatus.textProperty().bind(loginService.messageProperty());
+				progressBar.progressProperty().bind(
+						loginService.progressProperty());
+			}
+		});
+
+		loginService.setOnFailed(new EventHandler<WorkerStateEvent>() {
+			@Override
+			public void handle(WorkerStateEvent event) {
+				loginPane.setDisable(false);
+				lblStatus.setVisible(false);
+				progressBar.setVisible(false);
+				handleException(LoginController.class, "initialize", loginService.getException());
 			}
 		});
 	}

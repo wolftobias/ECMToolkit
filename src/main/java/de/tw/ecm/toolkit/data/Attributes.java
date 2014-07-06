@@ -2,8 +2,6 @@ package main.java.de.tw.ecm.toolkit.data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Spliterator;
-import java.util.function.Consumer;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;

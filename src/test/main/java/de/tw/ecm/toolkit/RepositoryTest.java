@@ -59,7 +59,7 @@ public class RepositoryTest {
 		repository.setId("MySQL_ECMToolkit1");
 		repository
 				.setDataSourceClassname("main.java.de.tw.ecm.toolkit.data.sources.JDBCDataSource");
-		repository.setProperties(properties);
+		repository.setECMProperties(properties);
 		repository.setEntities(this.createEntities());
 		
 		Repositories repositories = new Repositories();

@@ -7,9 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
+import main.java.de.tw.ecm.toolkit.auth.User;
 import main.java.de.tw.ecm.toolkit.data.Attribute;
 import main.java.de.tw.ecm.toolkit.data.Attribute.Caption;
 import main.java.de.tw.ecm.toolkit.data.Attributes;
@@ -56,12 +56,11 @@ public class JDBCDataSource extends AbstractDataSource {
 	}
 
 	@Override
-	public boolean login(String username, String password)
-			throws DataSourceException {
+	public void login(User user) throws DataSourceException {
 		try {
-			connection = DriverManager.getConnection(url + "?user=" + username
-					+ "&password=" + password);
-			return true;
+			String _url = url + "?user=" + user.getUserId() + "&password="
+					+ user.getPassword();
+			connection = DriverManager.getConnection(_url);
 		} catch (SQLException e) {
 			throw new DataSourceException(e);
 		}
@@ -128,19 +127,19 @@ public class JDBCDataSource extends AbstractDataSource {
 
 		for (int i = 0; i < headers.size(); i++) {
 			String header = headers.get(i);
-			
-			if(!primaryKeys.contains(header)) {
+
+			if (!primaryKeys.contains(header)) {
 				columns += header + " = ?";
-	
+
 				if (i < headers.size() - 1) {
 					columns += ", ";
 				}
 			}
 		}
-		
+
 		sql += columns;
 		sql += " WHERE ";
-		
+
 		for (int j = 0; j < primaryKeys.size(); j++) {
 			sql += primaryKeys.get(j) + " = ?";
 
@@ -148,7 +147,7 @@ public class JDBCDataSource extends AbstractDataSource {
 				sql += " AND ";
 			}
 		}
-		
+
 		return sql;
 	}
 
@@ -205,7 +204,6 @@ public class JDBCDataSource extends AbstractDataSource {
 				this.readColumnInfo(entity, primaryKeys);
 				entities.add(entity);
 			}
-
 		} catch (SQLException e) {
 			throw new DataSourceException(e);
 		} finally {
@@ -303,17 +301,20 @@ public class JDBCDataSource extends AbstractDataSource {
 			for (int i = 0; i < dataList.size(); i++) {
 				DataRow dataRow = dataList.get(i);
 				int parameterIndex = 1;
-				for (int j = 0; j < dataRow.size(); j++) {
+				int len = dataRow.size()
+						- dataList.getEntity().getPrimaryKeys().size();
+				for (int j = 0; j <= len; j++) {
 					int primaryKeyPos = dataList.primaryKeyPos();
-					if(j != primaryKeyPos)
+					if (j != primaryKeyPos)
 						pstmt.setObject(parameterIndex++, dataRow.get(j));
 				}
-				
-				for (int j = 0; j < primaryKeys.size(); j++) {
-					int position = dataList.getHeader().getPosition(primaryKeys.get(j));
+
+				for (int k = 0; k < primaryKeys.size(); k++) {
+					int position = dataList.getHeader().getPosition(
+							primaryKeys.get(k));
 					Object object = dataRow.get(position);
 					pstmt.setObject(parameterIndex++, object);
-				}				
+				}
 				pstmt.addBatch();
 			}
 			pstmt.executeBatch();

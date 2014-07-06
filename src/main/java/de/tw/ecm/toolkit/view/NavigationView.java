@@ -5,11 +5,21 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 
-@XmlType(propOrder = { "id", "default", "controller", "resources", "fxml",
-		"views" })
+@XmlType(propOrder = { "id", "controller", "resources", "fxml", "views" })
 public class NavigationView extends BaseViews<ContentView> {
+
+	protected String id;
+
+	protected String controller;
+
+	protected Class controllerClass;
+
+	protected String resources;
+
+	protected String fxml;
 
 	public NavigationView() {
 	}
@@ -33,64 +43,59 @@ public class NavigationView extends BaseViews<ContentView> {
 		return this.getById(this.defaultView);
 	}
 
-	@Override
-	@XmlAttribute
-	public String getId() {
-		return super.getId();
-	}
-	
-	@Override
-	public void setId(String id) {
-		super.setId(id);
-	}
-	
-	@Override
-	@XmlAttribute
-	public String getDefault() {
-		return super.getDefault();
-	}
-	
-	@Override
-	public void setDefault(String defaultView) {
-		super.setDefault(defaultView);
-	}
-	
-	@Override
-	@XmlElement
-	public String getFxml() {
-		return super.getFxml();
-	}
-	
-	@Override
-	public void setFxml(String fxml) {
-		super.setFxml(fxml);
+	@XmlTransient
+	public Class getControllerClass() {
+		return controllerClass;
 	}
 
-	@Override
+	public void setControllerClass(Class controllerClass) {
+		this.controllerClass = controllerClass;
+	}
+
+	@XmlAttribute
+	public String getId() {
+		return this.id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	@XmlElement
+	public String getFxml() {
+		return this.fxml;
+	}
+
+	public void setFxml(String fxml) {
+		this.fxml = fxml;
+	}
+
 	@XmlElement
 	public String getResources() {
-		return super.getResources();
+		return this.resources;
 	}
-	
-	@Override
+
 	public void setResources(String resources) {
-		super.setResources(resources);
+		this.resources = resources;
 	}
-	
-	@Override
+
 	@XmlElement
 	public String getController() {
-		return super.getController();
+		return this.controller;
 	}
-	
-	@Override
+
 	public void setController(String controller) {
-		super.setController(controller);
+		this.controller = controller;
 	}
 
 	@Override
 	public NavigationView build() {
-		super.build();
+		try {
+			this.controllerClass = Class.forName(this.controller);
+		} catch (ClassNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+
 		for (ContentView contentView : this.values) {
 			contentView.build();
 		}

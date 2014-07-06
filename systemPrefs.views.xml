@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <views>
     <view id="QueryAnalyser" user="*" group="*" default="DataSourceTree">
-        <navigationviews>
-            <navigationview id="DataSourceTree" default="QueryAnalyser">
-                <controller>main.java.de.tw.ecm.toolkit.view.user.DataSourceExplorerController</controller>
+        <navigationviews default="QueryAnalyser">
+            <navigationView id="DataSourceTree">
+                <controller>main.java.de.tw.ecm.toolkit.view.plugins.DataSourceExplorerController</controller>
                 <resources>datasourceexplorer.properties</resources>
                 <fxml>datasourceexplorer.fxml</fxml>
                 <contentviews>
-                    <contentview id="QueryAnalyser" default="QueryAnalyser">
-                        <controller>main.java.de.tw.ecm.toolkit.view.user.QueryAnalyserController</controller>
+                    <contentview id="QueryAnalyser">
+                        <controller>main.java.de.tw.ecm.toolkit.view.plugins.QueryAnalyserController</controller>
                         <resources>queryanalyser.properties</resources>
                         <fxml>queryanalyser.fxml</fxml>
                     </contentview>
                 </contentviews>
-            </navigationview>
+            </navigationView>
         </navigationviews>
     </view>
 </views>

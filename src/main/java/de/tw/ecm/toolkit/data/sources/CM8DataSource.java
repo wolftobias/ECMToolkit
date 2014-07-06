@@ -2,8 +2,8 @@ package main.java.de.tw.ecm.toolkit.data.sources;
 
 import java.util.List;
 
+import main.java.de.tw.ecm.toolkit.auth.User;
 import main.java.de.tw.ecm.toolkit.data.DataList;
-import main.java.de.tw.ecm.toolkit.data.DataRow;
 import main.java.de.tw.ecm.toolkit.data.Entities;
 import main.java.de.tw.ecm.toolkit.data.Entity;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
@@ -17,14 +17,12 @@ public class CM8DataSource extends AbstractDataSource {
 	@Override
 	public void destroy() throws DataSourceException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public boolean login(String username, String password)
-			throws DataSourceException {
+	public void login(User user) throws DataSourceException {
 		// TODO Auto-generated method stub
-		return false;
 	}
 
 	@Override
@@ -36,7 +34,7 @@ public class CM8DataSource extends AbstractDataSource {
 	@Override
 	public void create(Entity entity, DataList list) throws DataSourceException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -56,19 +54,19 @@ public class CM8DataSource extends AbstractDataSource {
 	@Override
 	public void update(Entity entity, DataList list) throws DataSourceException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void delete(Entity entity, DataList list) throws DataSourceException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void delete(Entity entity, String sql) throws DataSourceException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -76,8 +74,5 @@ public class CM8DataSource extends AbstractDataSource {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
-
 
 }
