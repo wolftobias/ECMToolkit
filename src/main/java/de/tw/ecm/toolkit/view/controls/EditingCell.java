@@ -1,4 +1,4 @@
-package main.java.de.tw.ecm.toolkit.view.table;
+package main.java.de.tw.ecm.toolkit.view.controls;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

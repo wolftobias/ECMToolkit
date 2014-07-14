@@ -9,6 +9,7 @@ import main.java.de.tw.ecm.toolkit.data.Entities;
 import main.java.de.tw.ecm.toolkit.data.Entity;
 import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
+import main.java.de.tw.ecm.toolkit.data.writer.DataWriter;
 
 public interface DataSource {
 
@@ -21,20 +22,21 @@ public interface DataSource {
 
 	public Entities getEntities() throws DataSourceException;
 
-	public void create(Entity entity, DataList list) throws DataSourceException;
-
 	public DataReader read(Entity entity, String query)
 			throws DataSourceException;
 
-	public DataList readList(Entity entity, String query)
+	public DataWriter create(Entity entity, DataList dataList)
 			throws DataSourceException;
 
-	public void update(Entity entity, DataList list) throws DataSourceException;
+	public DataWriter update(Entity entity, DataList dataList)
+			throws DataSourceException;
 
-	public void delete(Entity entity, DataList list) throws DataSourceException;
+	public DataWriter delete(Entity entity, DataList dataList)
+			throws DataSourceException;
 
-	public void delete(Entity entity, String sql) throws DataSourceException;
+	public void commit() throws DataSourceException;
+
+	public void rollback() throws DataSourceException;
 
 	public String defaultSelectQuery(String table, List<String> headers);
-
 }

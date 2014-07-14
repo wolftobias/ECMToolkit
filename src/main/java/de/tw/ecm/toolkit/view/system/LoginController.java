@@ -73,9 +73,9 @@ public class LoginController extends AbstractController {
 							cmbRepository.setValue(bootstrapService
 									.getDefaultRepository().getCaption());
 
-							if (context.getCommandLine().hasOption("userid"))
+							if (context.getCommandLine().hasOption("user"))
 								setUsername(context.getCommandLine()
-										.getOptionValue("userid"));
+										.getOptionValue("user"));
 							if (context.getCommandLine().hasOption("password"))
 								setPassword(context.getCommandLine()
 										.getOptionValue("password"));
@@ -109,8 +109,8 @@ public class LoginController extends AbstractController {
 
 	public void onLogin(ActionEvent event) {
 		this.loginPane.setDisable(true);
-		User user = new User(txtUsername.getText(), pwdPassword.getText());
-		LoginService loginService = new LoginService(user);
+		final User user = new User(txtUsername.getText(), pwdPassword.getText());
+		final LoginService loginService = new LoginService(user);
 		loginService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
 			public void handle(WorkerStateEvent event) {

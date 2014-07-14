@@ -38,11 +38,11 @@ import main.java.de.tw.ecm.toolkit.data.Attributes;
 import main.java.de.tw.ecm.toolkit.data.DataList;
 import main.java.de.tw.ecm.toolkit.data.DataRow;
 import main.java.de.tw.ecm.toolkit.data.Entity;
+import main.java.de.tw.ecm.toolkit.service.CRUDService;
 import main.java.de.tw.ecm.toolkit.service.CRUDService.CreateService;
-import main.java.de.tw.ecm.toolkit.service.CRUDService.DeleteListService;
-import main.java.de.tw.ecm.toolkit.service.CRUDService.ReadListService;
+import main.java.de.tw.ecm.toolkit.service.CRUDService.DeleteService;
 import main.java.de.tw.ecm.toolkit.service.CRUDService.UpdateService;
-import main.java.de.tw.ecm.toolkit.service.FileService.ReadService;
+import main.java.de.tw.ecm.toolkit.service.FileService;
 import main.java.de.tw.ecm.toolkit.service.FileService.WriteService;
 
 /**
@@ -109,8 +109,7 @@ public class QueryAnalyserController extends AbstractUserController {
 
 	public void onPlay(ActionEvent event) {
 		String query = queryTextArea.getText();
-
-		ReadListService readListService = new ReadListService(
+		final CRUDService.ReadService readListService = new CRUDService.ReadService(
 				this.selectedEntity, query);
 		readListService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			@Override
@@ -160,8 +159,10 @@ public class QueryAnalyserController extends AbstractUserController {
 					// check for primary key column
 					if (!newList.getEntity().getPrimaryKeys()
 							.contains(columnId)) {
+						int position = newList.getHeader()
+								.getPosition(columnId);
+						row.set(position, newValue);
 						newList.addNew(row);
-						newList.replaceRowValue(columnId, newValue);
 
 						UpdateService updateService = new UpdateService(
 								selectedEntity, newList);
@@ -185,7 +186,8 @@ public class QueryAnalyserController extends AbstractUserController {
 		this.selectedFile = fileChooser.showOpenDialog(this.context
 				.getRootWindow());
 
-		ReadService readService = new ReadService(selectedFile, selectedEntity);
+		final FileService.ReadService readService = new FileService.ReadService(
+				selectedFile, selectedEntity);
 		this.selectedFile = this.selectedFile.getParentFile();
 
 		if (this.selectedFile != null) {
@@ -193,7 +195,7 @@ public class QueryAnalyserController extends AbstractUserController {
 				@Override
 				public void handle(WorkerStateEvent event) {
 					DataList items = readService.getValue();
-					DataList newItems = selectedEntity.newList();
+					final DataList newItems = selectedEntity.newList();
 					newItems.setValues(items.toList());
 					CreateService createService = new CreateService(
 							selectedEntity, newItems);
@@ -241,9 +243,9 @@ public class QueryAnalyserController extends AbstractUserController {
 	public void onDeleteRow() {
 		List<DataRow> selectedItems = this.tableView.getSelectionModel()
 				.getSelectedItems();
-		DataList deleteItems = selectedEntity.newList();
+		final DataList deleteItems = selectedEntity.newList();
 		deleteItems.setValues(selectedItems);
-		Service deleteService = new DeleteListService(this.selectedEntity,
+		Service deleteService = new DeleteService(this.selectedEntity,
 				deleteItems);
 		deleteService.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
 			public void handle(WorkerStateEvent event) {

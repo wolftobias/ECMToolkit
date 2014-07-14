@@ -70,7 +70,7 @@ public class ECMToolkit extends Application {
 
 	private void parseCmd(Parameters parameters) throws ParseException {
 		Options options = new Options();
-		options.addOption("u", "userid", true, "userid login name");
+		options.addOption("u", "user", true, "user login name");
 		options.addOption("p", "password", true, "userid password");
 
 		List<String> rawList = parameters.getRaw();

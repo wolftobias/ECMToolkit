@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import main.java.de.tw.ecm.toolkit.data.DataHeader;
 import main.java.de.tw.ecm.toolkit.data.DataRow;
@@ -72,7 +73,8 @@ public class JDBCDataReader extends AbstractDataReader {
 		DataHeader header = new DataHeader();
 		try {
 			PreparedStatement prepareStatement = this.connection
-					.prepareStatement("SELECT * FROM " + this.getEntity().getId());
+					.prepareStatement("SELECT * FROM "
+							+ this.getEntity().getId());
 			ResultSet rs = prepareStatement.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
 
@@ -80,7 +82,8 @@ public class JDBCDataReader extends AbstractDataReader {
 			for (int i = 1; i <= columnCount; i++) {
 				String columnName = rsmd.getColumnName(i);
 
-				header.add(columnName, this.entity.getAttributes().getCaptionByName(columnName));
+				header.add(columnName, this.entity.getAttributes()
+						.getCaptionByName(columnName));
 			}
 		} catch (Exception e) {
 			throw new ReaderException(e);
@@ -92,5 +95,32 @@ public class JDBCDataReader extends AbstractDataReader {
 	@Override
 	public Entity getEntity() throws ReaderException {
 		return this.entity;
+	}
+
+	@Override
+	public int getRowCount(String query) throws ReaderException {
+		ResultSet rSet = null;
+		int rowCount = -1;
+		try {
+			String _query = query.toUpperCase();
+			String sql = "SELECT COUNT(*) " + _query.substring(_query.indexOf("FROM"));
+			
+			Statement stmt = this.connection.createStatement();
+			rSet = stmt.executeQuery(sql);
+			if(rSet.next())
+				rowCount = rSet.getInt(1);
+			return rowCount;
+		} catch (Exception e) {
+			throw new ReaderException(e);
+		} finally {
+			if (rSet != null) {
+				try {
+					rSet.close();
+				} catch (SQLException e) {
+					throw new ReaderException(e);
+				}
+			}
+		}
+
 	}
 }

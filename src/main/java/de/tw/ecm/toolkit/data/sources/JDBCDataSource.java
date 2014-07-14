@@ -24,6 +24,9 @@ import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.JDBCDataReader;
 import main.java.de.tw.ecm.toolkit.data.reader.ReaderException;
+import main.java.de.tw.ecm.toolkit.data.writer.DataWriter;
+import main.java.de.tw.ecm.toolkit.data.writer.JDBCDataWriter;
+import main.java.de.tw.ecm.toolkit.data.writer.WriterException;
 
 import com.sun.istack.internal.logging.Logger;
 
@@ -34,10 +37,11 @@ public class JDBCDataSource extends AbstractDataSource {
 	public static final String DRIVER = "driver";
 	public static final String URL = "url";
 
-	private Connection connection;
 	private String driver;
 	private String url;
 	private Entities entities;
+	private User user;
+	private Connection connection;
 
 	public JDBCDataSource() {
 	}
@@ -57,10 +61,11 @@ public class JDBCDataSource extends AbstractDataSource {
 
 	@Override
 	public void login(User user) throws DataSourceException {
+		this.user = user;
+		String _url = url + "?user=" + user.getUserId() + "&password="
+				+ user.getPassword();
 		try {
-			String _url = url + "?user=" + user.getUserId() + "&password="
-					+ user.getPassword();
-			connection = DriverManager.getConnection(_url);
+			this.connection = DriverManager.getConnection(_url);
 		} catch (SQLException e) {
 			throw new DataSourceException(e);
 		}
@@ -102,8 +107,83 @@ public class JDBCDataSource extends AbstractDataSource {
 		return queryString.toUpperCase();
 	}
 
-	private String insertQuery(String table, List<String> headers) {
-		String sql = "INSERT INTO " + table + " (%s) VALUES (%s)";
+	@Override
+	public DataWriter create(Entity entity, DataList dataList)
+			throws DataSourceException {
+		List<String> headers = dataList.getHeaderNames();
+		String sql = this.insertQuery(entity, headers);
+		JDBCDataWriter writer;
+
+		try {
+			writer = new JDBCDataWriter(entity, dataList, this.connection);
+			writer.open(sql);
+			return writer;
+		} catch (WriterException e) {
+			throw new DataSourceException(e);
+		}
+	}
+
+	@Override
+	public DataWriter update(Entity entity, DataList dataList)
+			throws DataSourceException {
+		List<String> headers = dataList.getHeaderNames();
+		String sql = this.updateQuery(entity, headers);
+		JDBCDataWriter writer;
+		
+		try {
+			writer = new JDBCDataWriter(entity, dataList, this.connection);
+			writer.open(sql);
+			return writer;
+		} catch (WriterException e) {
+			throw new DataSourceException(e);
+		}
+	}
+
+	@Override
+	public DataWriter delete(Entity entity, DataList dataList)
+			throws DataSourceException {
+		String sql = this.deleteQuery(entity);
+		JDBCDataWriter writer;
+		
+		try {
+			writer = new JDBCDataWriter(entity, dataList, this.connection);
+			writer.open(sql);
+			return writer;
+		} catch (WriterException e) {
+			throw new DataSourceException(e);
+		}
+	}
+
+	@Override
+	public void commit() throws DataSourceException {
+		try {
+			this.connection.commit();
+		} catch (SQLException e) {
+			throw new DataSourceException(e);
+		}
+	}
+
+	@Override
+	public void rollback() throws DataSourceException {
+		try {
+			this.connection.rollback();
+		} catch (SQLException e) {
+			throw new DataSourceException(e);
+		}
+	}
+
+	@Override
+	public void destroy() throws DataSourceException {
+		try {
+			if (connection != null)
+				connection.close();
+		} catch (SQLException e) {
+			log.logSevereException(e);
+		}
+	}
+
+	private String insertQuery(Entity entity, List<String> headers) {
+		String sql = "INSERT INTO " + entity.getId() + " (%s) VALUES (%s)";
 		String columns = "";
 		String values = "";
 
@@ -164,16 +244,6 @@ public class JDBCDataSource extends AbstractDataSource {
 		}
 
 		return sql;
-	}
-
-	@Override
-	public void destroy() throws DataSourceException {
-		try {
-			if (this.connection != null)
-				this.connection.close();
-		} catch (SQLException e) {
-			throw new DataSourceException(e);
-		}
 	}
 
 	private void closeQuietly(ResultSet rs) {
@@ -262,98 +332,5 @@ public class JDBCDataSource extends AbstractDataSource {
 			closeQuietly(rs);
 		}
 		return primaryKeys;
-	}
-
-	@Override
-	public void create(Entity entity, DataList dataList)
-			throws DataSourceException {
-		List<String> headers = dataList.getHeaderNames();
-		String sql = this.insertQuery(dataList.getEntity().getId(), headers);
-
-		try {
-			this.connection.setAutoCommit(false);
-			PreparedStatement pstmt = this.connection.prepareStatement(sql);
-			for (int i = 0; i < dataList.size(); i++) {
-				DataRow dataRow = dataList.get(i);
-				for (int j = 0; j < dataRow.size(); j++) {
-					pstmt.setObject(j + 1, dataRow.get(j));
-				}
-				pstmt.addBatch();
-			}
-			pstmt.executeBatch();
-			this.connection.commit();
-			this.connection.setAutoCommit(true);
-		} catch (SQLException e) {
-			throw new DataSourceException(e);
-		}
-	}
-
-	@Override
-	public void update(Entity entity, DataList dataList)
-			throws DataSourceException {
-		List<String> headers = dataList.getHeaderNames();
-		PrimaryKeys primaryKeys = entity.getPrimaryKeys();
-		String sql = this.updateQuery(dataList.getEntity(), headers);
-
-		try {
-			this.connection.setAutoCommit(false);
-			PreparedStatement pstmt = this.connection.prepareStatement(sql);
-			for (int i = 0; i < dataList.size(); i++) {
-				DataRow dataRow = dataList.get(i);
-				int parameterIndex = 1;
-				int len = dataRow.size()
-						- dataList.getEntity().getPrimaryKeys().size();
-				for (int j = 0; j <= len; j++) {
-					int primaryKeyPos = dataList.primaryKeyPos();
-					if (j != primaryKeyPos)
-						pstmt.setObject(parameterIndex++, dataRow.get(j));
-				}
-
-				for (int k = 0; k < primaryKeys.size(); k++) {
-					int position = dataList.getHeader().getPosition(
-							primaryKeys.get(k));
-					Object object = dataRow.get(position);
-					pstmt.setObject(parameterIndex++, object);
-				}
-				pstmt.addBatch();
-			}
-			pstmt.executeBatch();
-			this.connection.commit();
-			this.connection.setAutoCommit(true);
-		} catch (SQLException e) {
-			throw new DataSourceException(e);
-		}
-	}
-
-	@Override
-	public void delete(Entity entity, DataList dataList)
-			throws DataSourceException {
-		String sql = this.deleteQuery(entity);
-		DataHeader header = dataList.getHeader();
-		PrimaryKeys primaryKeys = entity.getPrimaryKeys();
-
-		try {
-			this.connection.setAutoCommit(false);
-			PreparedStatement pstmt = this.connection.prepareStatement(sql);
-			for (int i = 0; i < dataList.size(); i++) {
-				DataRow dataRow = dataList.get(i);
-				for (int j = 0; j < primaryKeys.size(); j++) {
-					int position = header.getPosition(primaryKeys.get(j));
-					pstmt.setObject(j + 1, dataRow.get(position));
-				}
-				pstmt.addBatch();
-			}
-			pstmt.executeBatch();
-			this.connection.commit();
-			this.connection.setAutoCommit(true);
-		} catch (SQLException e) {
-			throw new DataSourceException(e);
-		}
-	}
-
-	@Override
-	public void delete(Entity entity, String sql) throws DataSourceException {
-		// TODO Auto-generated method stub
-
 	}
 }

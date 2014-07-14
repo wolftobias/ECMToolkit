@@ -7,34 +7,26 @@ import main.java.de.tw.ecm.toolkit.data.DataList;
 import main.java.de.tw.ecm.toolkit.data.Entities;
 import main.java.de.tw.ecm.toolkit.data.Entity;
 import main.java.de.tw.ecm.toolkit.data.reader.DataReader;
+import main.java.de.tw.ecm.toolkit.data.writer.DataWriter;
 
 public class CM8DataSource extends AbstractDataSource {
-
-	public CM8DataSource() {
-		// TODO Auto-generated constructor stub
-	}
 
 	@Override
 	public void destroy() throws DataSourceException {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public void login(User user) throws DataSourceException {
 		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
 	public Entities getEntities() throws DataSourceException {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void create(Entity entity, DataList list) throws DataSourceException {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -45,28 +37,36 @@ public class CM8DataSource extends AbstractDataSource {
 	}
 
 	@Override
-	public DataList readList(Entity entity, String query)
+	public DataWriter create(Entity entity, DataList dataList)
 			throws DataSourceException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void update(Entity entity, DataList list) throws DataSourceException {
+	public DataWriter update(Entity entity, DataList dataList)
+			throws DataSourceException {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
 	@Override
-	public void delete(Entity entity, DataList list) throws DataSourceException {
+	public DataWriter delete(Entity entity, DataList dataList)
+			throws DataSourceException {
 		// TODO Auto-generated method stub
-
+		return null;
 	}
 
 	@Override
-	public void delete(Entity entity, String sql) throws DataSourceException {
+	public void commit() throws DataSourceException {
 		// TODO Auto-generated method stub
+		
+	}
 
+	@Override
+	public void rollback() throws DataSourceException {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
@@ -74,5 +74,6 @@ public class CM8DataSource extends AbstractDataSource {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 }

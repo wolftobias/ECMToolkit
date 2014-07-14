@@ -97,6 +97,11 @@ public class CSVDataReader extends AbstractDataReader {
 		return this.entity;
 	}
 
+	@Override
+	public int getRowCount(String query) throws ReaderException {
+		return this.csvReader.length();
+	}
+
 	private void _readHeaders() throws ReaderException {
 		try {
 			this.dataHeader = new DataHeader();

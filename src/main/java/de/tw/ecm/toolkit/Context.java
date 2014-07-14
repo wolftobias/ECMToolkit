@@ -6,6 +6,9 @@ import java.util.PropertyResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javafx.beans.property.ListProperty;
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.fxml.JavaFXBuilderFactory;
@@ -20,6 +23,7 @@ import main.java.de.tw.ecm.toolkit.data.sources.DataSource;
 import main.java.de.tw.ecm.toolkit.prefs.PreferencesFactory;
 import main.java.de.tw.ecm.toolkit.prefs.SystemPreferences;
 import main.java.de.tw.ecm.toolkit.prefs.UserPreferences;
+import main.java.de.tw.ecm.toolkit.service.AbstractService;
 import main.java.de.tw.ecm.toolkit.view.ContentView;
 import main.java.de.tw.ecm.toolkit.view.MonitoringView;
 import main.java.de.tw.ecm.toolkit.view.MonitoringViews;
@@ -56,6 +60,9 @@ public class Context {
 	private DataSource dataSource;
 
 	private User user;
+
+	private ListProperty<AbstractService<?>> runningServices = new SimpleListProperty<AbstractService<?>>(
+			FXCollections.<AbstractService<?>> observableArrayList());
 
 	private Context() {
 		this.systemPrefs = PreferencesFactory.systemPrefs();
@@ -137,7 +144,11 @@ public class Context {
 	public void setUser(User user) {
 		this.user = user;
 	}
-
+	
+	public ListProperty<AbstractService<?>> runningServices() {
+		return this.runningServices;
+	}
+	
 	public class ViewContext {
 
 		private Stage primaryStage;

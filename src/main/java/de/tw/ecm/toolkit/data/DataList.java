@@ -51,16 +51,6 @@ public class DataList extends Values<DataRow> {
 		return this.header.getCaptions();
 	}
 	
-	public boolean replaceRowValue(String header, Object newValue) {
-		int position = this.header.getPosition(header);
-		for (int i = 0; i < this.values.size(); i++) {
-			DataRow dataRow = this.values.get(i);
-			dataRow.set(position, newValue);
-			return true;
-		}
-		return false;
-	}
-	
 	public int primaryKeyPos() {
 		List<String> names = this.header.getNames();
 		for (int i = 0; i < names.size(); i++) {

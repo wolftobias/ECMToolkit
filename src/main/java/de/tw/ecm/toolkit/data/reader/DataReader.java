@@ -6,7 +6,7 @@ import main.java.de.tw.ecm.toolkit.data.Entity;
 
 public interface DataReader {
 
-	public void open(String url) throws ReaderException;
+	public void open(String query) throws ReaderException;
 
 	public void close() throws ReaderException;
 
@@ -17,5 +17,7 @@ public interface DataReader {
 	public DataHeader readHeaders() throws ReaderException;
 
 	public Entity getEntity() throws ReaderException;
+	
+	public int getRowCount(String query) throws ReaderException;
 
 }

@@ -31,17 +31,26 @@ public class FileService {
 
 		@Override
 		protected Task<DataList> createTask() {
-			return new Task() {
+			return new Task<DataList>() {
 				@Override
-				protected Object call() throws Exception {
+				protected DataList call() throws Exception {
 					updateMessage("reading file...");
+					
+					int counter = 1;
 					DataList dataList = null;
 					DataReader reader = null;
 
 					try {
 						reader = new CSVDataReader(file, entity);
+						
+						int rowCount = reader.getRowCount(null);
+						updateProgress(counter, rowCount);
+						
 						dataList = new DataList(entity);
 						while (reader.next()) {
+							if(isCancelled())
+								break;
+							updateProgress(counter++, rowCount);
 							dataList.add(reader.readRow());
 						}
 					} finally {
@@ -63,22 +72,20 @@ public class FileService {
 
 		private File file;
 
-		private Entity entity;
-
 		private DataList list;
 
 		public WriteService(File file, Entity entity, DataList list) {
 			this.file = file;
-			this.entity = entity;
 			this.list = list;
 			this.start();
 		}
 
 		@Override
 		protected Task<Void> createTask() {
-			return new Task() {
+			return new Task<Void>() {
 				@Override
-				protected Object call() throws Exception {
+				protected Void call() throws Exception {
+					int counter = 0;
 					CSVDataWriter writer = null;
 					updateMessage("writing file...");
 					List<String> headers = list.getHeaderCaptions();
@@ -86,12 +93,15 @@ public class FileService {
 					if (headers.isEmpty())
 						headers = list.getHeaderNames();
 					try {
+						updateProgress(counter, list.size());
+						
 						writer = new CSVDataWriter(file);
 						writer.writeHeader(headers);
 
 						for (int i = 0; i < list.size(); i++) {
+							updateProgress(counter++, list.size());
 							DataRow dataRow = list.get(i);
-							writer.writeRow(dataRow);
+							writer.createRow(dataRow);
 						}
 					} finally {
 						close(writer);

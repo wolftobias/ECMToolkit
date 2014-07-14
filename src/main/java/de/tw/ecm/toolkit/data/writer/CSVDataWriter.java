@@ -16,11 +16,7 @@ public class CSVDataWriter extends AbstractDataWriter {
 
 	private CSVWriter csvWriter;
 
-	public CSVDataWriter() {
-	}
-
-	public CSVDataWriter(String file) throws WriterException {
-		this.open(file);
+	public CSVDataWriter() throws WriterException {
 	}
 
 	public CSVDataWriter(File file) throws WriterException {
@@ -37,8 +33,8 @@ public class CSVDataWriter extends AbstractDataWriter {
 	}
 
 	@Override
-	public void open(String url) throws WriterException {
-		this.open(new File(url));
+	public void open(String file) throws WriterException {
+		this.open(new File(file));
 	}
 
 	@Override
@@ -52,12 +48,22 @@ public class CSVDataWriter extends AbstractDataWriter {
 	}
 
 	@Override
-	public void writeRow(DataRow row) throws WriterException {
+	public void createRow(DataRow row) throws WriterException {
 		try {
 			this.csvWriter.write(row.toArray());
 		} catch (IOException e) {
 			throw new WriterException(e);
 		}
+	}
+
+	@Override
+	public void updateRow(DataRow items) throws WriterException {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void deleteRow(DataRow items) throws WriterException {
+		// TODO Auto-generated method stub
 	}
 
 	public void writeHeader(List<String> headers) throws WriterException {
