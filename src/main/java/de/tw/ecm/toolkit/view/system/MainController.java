@@ -74,8 +74,7 @@ public class MainController extends AbstractController {
 
 	@FXML
 	void onFullScreen(ActionEvent event) {
-		this.context.getViewContext().setFullScreen(
-				this.mnFullScreen.isSelected());
+		this.viewContext.setFullScreen(this.mnFullScreen.isSelected());
 	}
 
 	public void addNavigationTab(String caption, Node navigationPane) {

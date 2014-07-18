@@ -1,4 +1,4 @@
-package test.main.java.de.tw.ecm.toolkit;
+package test.java.de.tw.ecm.toolkit;
 
 import java.io.File;
 import java.io.FileInputStream;

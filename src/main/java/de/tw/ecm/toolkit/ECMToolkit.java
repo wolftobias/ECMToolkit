@@ -6,19 +6,20 @@
 package main.java.de.tw.ecm.toolkit;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
 import main.java.de.tw.ecm.toolkit.data.sources.DataSource;
-import main.java.de.tw.ecm.toolkit.data.sources.DataSourceException;
+import main.java.de.tw.ecm.toolkit.util.Context;
+import main.java.de.tw.ecm.toolkit.util.ViewContext;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  *
@@ -26,46 +27,52 @@ import org.apache.commons.cli.ParseException;
  */
 public class ECMToolkit extends Application {
 
-	Logger log = Logger.getLogger(ECMToolkit.class.getName());
+	Logger log = LogManager.getLogger(ECMToolkit.class);
 
 	private Context context;
-
+	
+	private ViewContext viewContext;
+	
 	private Stage primaryStage;
 
 	@Override
 	public void init() throws Exception {
 		super.init();
-		// add shutdown hook to close all open datasource resources
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			@Override
-			public void run() {
-				try {
-					log.info("JVM was terminated!");
-					DataSource dataSource = context.getDataSource();
-					if (dataSource != null)
-						dataSource.destroy();
-				} catch (DataSourceException e) {
-					throw new RuntimeException(e);
-				}
-			}
-		});
 	}
 
 	@Override
 	public void start(Stage primaryStage) {
+		log.entry();
 		this.primaryStage = primaryStage;
 		try {
 			this.context = Context.context();
+			this.viewContext = ViewContext.context();
 			this.context.put(this);
-			this.context.getViewContext().setPrimaryStage(primaryStage);
+			this.viewContext.setPrimaryStage(primaryStage);
 			this.parseCmd(this.getParameters());
 			primaryStage.setTitle("ECM Toolkit");
-			this.context.getViewContext().showLoginView();
+			this.viewContext.showLoginView();
 			primaryStage.show();
 		} catch (Exception ex) {
-			Logger.getLogger(ECMToolkit.class.getName()).log(Level.SEVERE,
-					ex.getMessage(), ex);
+			log.catching(ex);
 		}
+		log.exit();
+	}
+
+	@Override
+	public void stop() throws Exception {
+		log.entry();
+		super.stop();
+		DataSource dataSource = context.getDataSource();
+		if (dataSource != null) {
+			dataSource.destroy();
+			log.debug("datasource destroyed");
+		}
+		log.exit();
+	}
+
+	public Stage getPrimaryStage() {
+		return primaryStage;
 	}
 
 	private void parseCmd(Parameters parameters) throws ParseException {
@@ -79,15 +86,6 @@ public class ECMToolkit extends Application {
 		CommandLine commandLine = parser.parse(options,
 				(String[]) rawList.toArray(new String[rawList.size()]));
 		this.context.put(commandLine);
-	}
-
-	@Override
-	public void stop() throws Exception {
-		this.context.getDataSource().destroy();
-	}
-
-	public Stage getPrimaryStage() {
-		return primaryStage;
 	}
 
 	/**

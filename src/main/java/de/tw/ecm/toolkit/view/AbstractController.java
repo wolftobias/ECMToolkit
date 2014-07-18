@@ -7,9 +7,9 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import javafx.fxml.Initializable;
-import main.java.de.tw.ecm.toolkit.Context;
 import main.java.de.tw.ecm.toolkit.data.Repository;
-import main.java.de.tw.ecm.toolkit.data.sources.DataSource;
+import main.java.de.tw.ecm.toolkit.util.Context;
+import main.java.de.tw.ecm.toolkit.util.ViewContext;
 
 import org.controlsfx.dialog.Dialogs;
 
@@ -24,6 +24,8 @@ public abstract class AbstractController implements Initializable {
 
 	protected Context context;
 
+	protected ViewContext viewContext;
+	
 	protected URL location;
 
 	protected ResourceBundle resources;
@@ -33,6 +35,7 @@ public abstract class AbstractController implements Initializable {
 		log = Logger.getLogger(this.getClass().getName());
 		this.location = location;
 		this.resources = resources;
+		this.viewContext = ViewContext.context();
 		this.context = Context.context();
 		this.context.put(this);
 

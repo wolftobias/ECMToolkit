@@ -25,7 +25,7 @@ public class BootstrapService extends AbstractService<Void> {
 				repositories = new Repositories().build();
 				String repositoryId = repositories.getDefault();
 				selectedRepositoryById(repositoryId);
-				
+
 				return null;
 			}
 		};
@@ -46,7 +46,8 @@ public class BootstrapService extends AbstractService<Void> {
 		return selectedRepository;
 	}
 
-	public void selectedRepositoryByCaption(String caption) throws RepositoryException {
+	public void selectedRepositoryByCaption(String caption)
+			throws RepositoryException {
 		this.selectedRepository = this.repositories.getByCaption(caption);
 		this.initializeDataSource(this.selectedRepository);
 		this.context.setSelectedRepository(selectedRepository);
@@ -63,11 +64,13 @@ public class BootstrapService extends AbstractService<Void> {
 		return this.repositories.getById(_default);
 	}
 
-	private void initializeDataSource(Repository repository) throws RepositoryException {
+	private void initializeDataSource(Repository repository)
+			throws RepositoryException {
 		try {
 			Class<DataSource> dataSourceClass = repository.getDataSourceClass();
 			this.dataSource = (DataSource) dataSourceClass.newInstance();
-			this.dataSource.initialize(repository, repository.getECMProperties());
+			this.dataSource.initialize(repository,
+					repository.getECMProperties());
 			this.context.setDataSource(dataSource);
 		} catch (Exception e) {
 			throw new RepositoryException(e);

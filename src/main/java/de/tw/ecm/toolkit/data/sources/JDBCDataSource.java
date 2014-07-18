@@ -13,9 +13,7 @@ import main.java.de.tw.ecm.toolkit.auth.User;
 import main.java.de.tw.ecm.toolkit.data.Attribute;
 import main.java.de.tw.ecm.toolkit.data.Attribute.Caption;
 import main.java.de.tw.ecm.toolkit.data.Attributes;
-import main.java.de.tw.ecm.toolkit.data.DataHeader;
 import main.java.de.tw.ecm.toolkit.data.DataList;
-import main.java.de.tw.ecm.toolkit.data.DataRow;
 import main.java.de.tw.ecm.toolkit.data.ECMProperties;
 import main.java.de.tw.ecm.toolkit.data.Entities;
 import main.java.de.tw.ecm.toolkit.data.Entity;
@@ -28,11 +26,7 @@ import main.java.de.tw.ecm.toolkit.data.writer.DataWriter;
 import main.java.de.tw.ecm.toolkit.data.writer.JDBCDataWriter;
 import main.java.de.tw.ecm.toolkit.data.writer.WriterException;
 
-import com.sun.istack.internal.logging.Logger;
-
 public class JDBCDataSource extends AbstractDataSource {
-
-	Logger log = Logger.getLogger(JDBCDataSource.class);
 
 	public static final String DRIVER = "driver";
 	public static final String URL = "url";
@@ -129,7 +123,7 @@ public class JDBCDataSource extends AbstractDataSource {
 		List<String> headers = dataList.getHeaderNames();
 		String sql = this.updateQuery(entity, headers);
 		JDBCDataWriter writer;
-		
+
 		try {
 			writer = new JDBCDataWriter(entity, dataList, this.connection);
 			writer.open(sql);
@@ -144,7 +138,7 @@ public class JDBCDataSource extends AbstractDataSource {
 			throws DataSourceException {
 		String sql = this.deleteQuery(entity);
 		JDBCDataWriter writer;
-		
+
 		try {
 			writer = new JDBCDataWriter(entity, dataList, this.connection);
 			writer.open(sql);

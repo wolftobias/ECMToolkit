@@ -9,9 +9,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Service;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
-import main.java.de.tw.ecm.toolkit.Context;
 import main.java.de.tw.ecm.toolkit.data.Repository;
 import main.java.de.tw.ecm.toolkit.data.sources.DataSource;
+import main.java.de.tw.ecm.toolkit.util.Context;
 
 import org.controlsfx.dialog.Dialogs;
 

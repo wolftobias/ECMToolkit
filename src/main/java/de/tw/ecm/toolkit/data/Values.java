@@ -10,8 +10,6 @@ import java.util.function.Consumer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-import javax.xml.bind.annotation.XmlTransient;
-
 public abstract class Values<T> implements Iterable<T>, Cloneable {
 
 	protected List<T> values = new ArrayList<T>();

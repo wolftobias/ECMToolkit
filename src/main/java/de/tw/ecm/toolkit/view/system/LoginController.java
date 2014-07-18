@@ -115,7 +115,7 @@ public class LoginController extends AbstractController {
 			@Override
 			public void handle(WorkerStateEvent event) {
 				context.setUser(user);
-				context.getViewContext().showMainView();
+				viewContext.showMainView();
 			}
 		});
 

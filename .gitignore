@@ -46,3 +46,4 @@ gen/
 .classpath
 .project
 /.settings
+/target/
